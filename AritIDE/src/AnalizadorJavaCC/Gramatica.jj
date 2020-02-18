@@ -1,0 +1,98 @@
+
+options {
+  IGNORE_CASE = true;
+  STATIC = false;
+}
+
+PARSER_BEGIN(Gramatica)
+/** Analizador de lenguaje Arit **/
+
+//imports
+
+public class Gramatica{
+
+}
+PARSER_END(Gramatica)
+
+
+/* Análisis léxico*/
+
+SKIP : {
+    " "
+    | "\t"
+    | "\r"
+    | "\n"
+    | <"#" (~["\n", "\r"])*>
+    | <"#*" (~["*"])* "*" ("*" | ~["*","#"] (~["*"])* "*")* "#">
+}
+
+TOKEN : {
+
+  <NUMERO: (["0"-"9"])+>
+  | <DECIMAL: (["0"-"9"])+"."(["0"-"9"])+>
+  | <CADENA: "\""((~["\"","\n"]|~(\\,"\"")))"\"">
+  | <RNULL: "null">
+  | <RIF: "if">
+  | <RELSE: "else">
+  | <RPRINT: "print">
+  | <RSWITCH: "switch">
+  | <RCASE: "case">
+  | <RWHILE: "while">
+  | <RDO: "do">
+  | <RFOR: "for">
+  | <RIN: "in">
+  | <RBREAK: "break">
+  | <RCONTINUE: "continue">
+  | <RRETURN: "return">
+  | <RFUNC: "function">
+  | <RC: "c">
+  | <RTYPEOF: "typeof">
+  | <RLENGTH: "length">
+  | <RNCOL: "ncol">
+  | <RNROW: "nrow">
+  | <RSTRINGLENGTH: "stringlength">
+  | <RREMOVE: "remove">
+  | <RTOLOWER: "tolowercase">
+  | <RTOUPPER: "touppercase">
+  | <RTRUNK: "trunk">
+  | <RROUND: "round">
+  | <RMEAN: "mean">
+  | <RMEDIAN: "median">
+  | <RMODE: "mode">
+  | <RLIST: "list">
+  | <RMATRIX: "matrix">
+  | <RARRAY: "array">
+  | <RPIE: "pie">
+  | <RBARPLOT: "barplot">
+  | <RPLOT: "plot">
+  | <RHIST: "hist">
+
+  | <PTCOMA: ";">
+  | <COMA: ",">
+  | <DOSPT: ":">
+  | <PARIZQ: "(">
+  | <PARDER: ")">
+  | <CORIZQ: "[">
+  | <CORDER: "]">
+  | <LLAVEIZQ: "{">
+  | <LLAVEDER: "}">
+  | <MAS: "+">
+  | <MENOS: "-">
+  | <POR: "*">
+  | <DIV: "/">
+  | <POT: "^">
+  | <MOD: "%%">
+  | <TERNARIO: "?">
+  | <IGUAL: "=">
+  | <MENQUE: "<">
+  | <MAYQUE: ">">
+  | <MENIGUAL: "<=">
+  | <MAYIGUAL: ">=">
+  | <IGUALACION: "==">
+  | <DIFERENCIACION: "!=">
+  | <AND: "&">
+  | <OR: "|">
+  | <NOT: "!" >
+  | <IGUALFUNC: "=>">
+  | <IDENTIFICADOR: ["."]? ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_","."] | ["0"-"9"] )* >
+}
