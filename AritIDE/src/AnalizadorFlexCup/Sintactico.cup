@@ -18,6 +18,7 @@ parser code{:
     public void syntax_error(Symbol s){ 
         System.err.println("Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
         //CHECK ingresar a una lista de errores
+        Ventana.Errores.add(new NodoError(s.right,s.left,"Sintáctico","Error, no se esperaba el caracter: "+s.value));
     } 
     /**
      * Método al que se llama en el momento en que ya no es posible una recuperación de errores.
@@ -25,6 +26,7 @@ parser code{:
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
         System.err.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
         //CHECK ingresar a una lista de errores
+        Ventana.Errores.add(new NodoError(s.right,s.left,"Sintáctico","Error irrecuperable, no se esperaba el caracter: "+s.value));
     } 
      /**
      * Método que devuelve el AST que se generó después de realizar el análisis sintáctico. 
@@ -56,9 +58,9 @@ non terminal Instruccion instruccion;
 non terminal Instruccion expresion_numerica;
 non terminal Instruccion expresion,expresion_relacional;
 non terminal Instruccion expresion_logica;
-precedence left CONCAT;
+
 precedence left MAS,MENOS;
-precedence left POR,DIVIDIDO;
+precedence left POR,DIV;
 precedence right UMENOS; 
 
 start with ini;
@@ -77,7 +79,7 @@ instruccion ::=
         RIMPRIMIR PARIZQ expresion:a PARDER PTCOMA              {:RESULT = new Print();:}
         | IDENTIFICADOR IGUAL expresion PTCOMA                  {:RESULT = new Asignacion();:}
         | RIF PARIZQ expresion_logica:a PARDER bloque:b             {:RESULT = new If();:}
-
+    ;
 expresion ::= 
     expresion_numerica
     | expresion_logica

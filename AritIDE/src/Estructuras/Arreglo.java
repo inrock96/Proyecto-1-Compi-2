@@ -5,11 +5,21 @@
  */
 package Estructuras;
 
+import AST.NodoAST;
+
 /**
  *
  * @author inti_
  */
 public class Arreglo {
-    int dimensiones;
+    int dimension;
+    int dimensiones[];  
     Object[] valores;
+
+    public Arreglo(int dimension, int dimensiones[],NodoAST[] expresiones) {
+        this.dimension = dimension;
+        this.dimensiones = dimensiones;
+        this.valores = valores;
+    }
+    
 }

@@ -5,6 +5,7 @@
  */
 package GUI;
 
+import TablaDeSimbolos.NodoError;
 import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -36,10 +37,12 @@ public class Ventana extends javax.swing.JFrame {
      * Creates new form Ventana
      */
     public static JTextPane entrada; 
+    public static LinkedList<NodoError> Errores;
     LinkedList<String> nombrePestanas;
     boolean guardado;
     String nombre, path;
     public Ventana() {
+        Errores = new LinkedList<>();
         nombrePestanas = new LinkedList<>();
         initComponents();
         LineaText tmpL = new LineaText();

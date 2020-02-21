@@ -109,6 +109,9 @@ import java.util.*;
         {COMENTUNILINEA}  { System.out.println("reconoció comentario unilinea");}
         
     }
-    .{System.err.println("Este es un error léxico:"+yytext()+", en la linea: "+yyline+", en la columna: "+yychar)}
+
+.       { System.out.println("Error lexico "+yytext() + " Linea: "+(yyline+1)+ " Columna: "+yycolumn+1);
+          Ventana.Error.add(new NodoError(yychar,yyline,"Lexico","Error, carácter : "+yytext()+" no reconocido"));
+          }
 
 
