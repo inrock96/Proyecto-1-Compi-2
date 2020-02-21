@@ -36,8 +36,9 @@ parser code{:
 :}
 
 terminal String PTCOMA,PARIZQ,PARDER,LLAVIZQ,LLAVDER;
-terminal String MAS,MENOS,POR,DIV,POT;
+terminal String MAS,MENOS,POR,DIV,POT,MOD;
 terminal String MENQUE,MAYQUE,MENIGUAL,MAYIGUAL;
+terminal String OR, AND, NOT;
 terminal String NUMERO;
 terminal String DECIMAL;
 terminal String CADENA;
@@ -49,10 +50,12 @@ terminal String IDENTIFICADOR;
 
 non terminal ini;
 non terminal LinkedList<Instruccion> instrucciones;
+non terminal LinkedList<Instruccion> bloque; 
+non terminal Instruccion llamada, primitivo;
 non terminal Instruccion instruccion;
-non terminal Operacion expresion_numerica;
-non terminal Operacion expresion_cadena;
-non terminal Operacion expresion_logica;
+non terminal Instruccion expresion_numerica;
+non terminal Instruccion expresion,expresion_relacional;
+non terminal Instruccion expresion_logica;
 precedence left CONCAT;
 precedence left MAS,MENOS;
 precedence left POR,DIVIDIDO;
@@ -67,3 +70,47 @@ ini::= instrucciones:a{:
 
 instrucciones ::= instrucciones:a instruccion:b{:RESULT = a; RESULT.add(b);:}
                 | instruccion:a{:RESULT = new LinkedList<>();RESULT.add(a):}
+                
+;
+
+instruccion ::=
+        RIMPRIMIR PARIZQ expresion:a PARDER PTCOMA              {:RESULT = new Print();:}
+        | IDENTIFICADOR IGUAL expresion PTCOMA                  {:RESULT = new Asignacion();:}
+        | RIF PARIZQ expresion_logica:a PARDER bloque:b             {:RESULT = new If();:}
+
+expresion ::= 
+    expresion_numerica
+    | expresion_logica
+    | expresion_numerica
+    | PARIZQ expresion PARDER
+    | llamada
+    | primitivo
+    ;
+
+expresion_numerica::=
+    expresion:a MAS expresion:b                     {:return new ExpresionNumerica(OperadorAritmetico.MAS,a,b);:}
+    |expresion:a MENOS expresion:b                  {:return new ExpresionNumerica(OperadorAritmetico.MENOS,a,b);:}
+    |expresion:a POR expresion:b                    {:return new ExpresionNumerica(OperadorAritmetico.POR,a,b);:}
+    |expresion:a DIV expresion:b                    {:return new ExpresionNumerica(OperadorAritmetico.DIV,a,b);:}
+    |expresion:a POT expresion:b                    {:return new ExpresionNumerica(OperadorAritmetico.POT,a,b);:}                                                    {:return a;:}
+    |MENOS expresion:a                              {:return new ExpresionNumerica(OperadorAritmetico.MENOS,a);:}%prec UMENOS
+    ;
+expresion_relacional::=
+    expresion:a MAYQUE expresion:b                  {:return new ExpresionRelacional(OperadorRelacional.MAYQUE,a,b);:}
+    |expresion:a MAYIGUAL expresion:b               {:return new ExpresionRelacional(OperadorRelacional.MAYIGUAL,a,b);:}
+    |expresion:a MENQUE expresion:b                 {:return new ExpresionRelacional(OperadorRelacional.MENQUE,a,b);:}
+    |expresion:a MENIGUAL expresion:b               {:return new ExpresionRelacional(OperadorRelacional.MENIGUAL,a,b);:}
+    |expresion:a IGUALACION expresion:b             {:return new ExpresionRelacional(OperadorRelacional.IGUALACION,a,b);:}
+    |expresion:a DIFERIENCIACION expresion:b        {:return new ExpresionRelacional(OperadorRelacional.DIFERIENCIACION,a,b);:}
+    ;
+expresion_logica::=
+    expresion:a OR expresion                        {:return new ExpresionLogica(OperadorRelacional.OR,a,b);:}
+    |expresion:a AND expresion                      {:return new ExpresionLogica(OperadorRelacional.AND,a,b);:}
+    |NOT expresion:a                                {:return new ExpresionLogica(OperadorRelacional.NOT,a);:}
+    ;
+primitivo::=
+    NUMERO:a                                        {:return new Primitivo();:}
+    |DECIMAL:a                                      {:return new Primitivo();:}
+    |CADENA:a                                       {:return new Primitivo();:}
+    |IDENTIFICADOR:a                                {:return new Primitivo();:}
+    ;
