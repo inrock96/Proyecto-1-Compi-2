@@ -748,8 +748,7 @@ public class Lexico implements java_cup.runtime.Scanner {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
             { System.out.println("Error lexico "+yytext() + " Linea: "+(yyline+1)+ " Columna: "+yycolumn+1);
-          ErrorAnalisis nuevo = new ErrorAnalisis(yytext(),"Caracter no reconocido",yyline,yycolumn,0);
-          erroresLexicos.add(nuevo);
+          Ventana.Error.add(new NodoError(yychar,yyline,"Lexico","Error, carácter : "+yytext()+" no reconocido"));
             }
           case 72: break;
           case 2: 

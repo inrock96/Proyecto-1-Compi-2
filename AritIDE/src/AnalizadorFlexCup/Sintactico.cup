@@ -4,13 +4,15 @@
 package AnalizadorFlexCup;
 import java_cup.runtime.*;
 import java.util.*;
+import GUI.Ventana;
+import TablaDeSimbolos.NodoError;
 
 parser code{:
     /**
      *variable en la que se almacena el árbol
      *genera luego del análisis sintáctico
      */
-    public LinkedList<Instruccion> AST;
+    public LinkedList<NodoAST> AST;
     /**
      *Método que se llama automáticamente
      *al tener un error sintáctico
@@ -18,7 +20,7 @@ parser code{:
     public void syntax_error(Symbol s){ 
         System.err.println("Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
         //CHECK ingresar a una lista de errores
-        Ventana.Errores.add(new NodoError(s.right,s.left,"Sintáctico","Error, no se esperaba el caracter: "+s.value));
+        Ventana.Error.add(new NodoError(s.right,s.left,"Sintáctico","Error, no se esperaba el caracter: "+s.value));
     } 
     /**
      * Método al que se llama en el momento en que ya no es posible una recuperación de errores.
@@ -26,18 +28,18 @@ parser code{:
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
         System.err.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
         //CHECK ingresar a una lista de errores
-        Ventana.Errores.add(new NodoError(s.right,s.left,"Sintáctico","Error irrecuperable, no se esperaba el caracter: "+s.value));
+        Ventana.Error.add(new NodoError(s.right,s.left,"Sintáctico","Error irrecuperable, no se esperaba el caracter: "+s.value));
     } 
      /**
      * Método que devuelve el AST que se generó después de realizar el análisis sintáctico. 
      * @return árbol de sintaxis abstacta que será utilizado posteriormente en la ejecución.
      */
-    public LinkedList<Instruccion> getAST() {
+    public LinkedList<NodoAST> getAST() {
         return AST;
     }
 :}
 
-terminal String PTCOMA,PARIZQ,PARDER,LLAVIZQ,LLAVDER;
+terminal String PTCOMA,PARIZQ,PARDER,LLAVIZQ,LLAVDER, CORIZQ,CORDER, DOSPT, COMA;
 terminal String MAS,MENOS,POR,DIV,POT,MOD;
 terminal String MENQUE,MAYQUE,MENIGUAL,MAYIGUAL;
 terminal String OR, AND, NOT;
@@ -45,24 +47,74 @@ terminal String NUMERO;
 terminal String DECIMAL;
 terminal String CADENA;
 terminal String UMENOS;
-terminal String RIMPRIMIR, RWHILE,RIF,RELSE;
-terminal String IGUAL;
-terminal String IGUALACION,DIFERIENCIACION;
+terminal String RIMPRIMIR
+                ,RWHILE
+                ,RIF
+                ,RELSE
+                ,RC
+                ,RIN
+                , RDO
+                , IGUALFUNC
+                ,DIFERENCIACION
+                ,RFOR
+                ,RPIE
+                ,RNULL
+                ,RNROW
+                ,RNCOL
+                ,RLIST
+                ,RPLOT
+                ,RCASE
+                ,RHIST
+                ,RMEAN
+                ,RMODE
+                ,RPRINT
+                ,RROUND
+                ,RTRUNK
+                ,RARRAY
+                ,RBREAK
+                ,RLENGTH
+                ,RSWITCH
+                ,RRETURN
+                ,RREMOVE
+                ,RTYPEOF
+                ,RMEDIAN
+                ,RMATRIX
+                ,RBARPLOT
+                ,RFUNC
+                ,RCONTINUE
+                ,RTOLOWER
+                ,RTOUPPER
+                ,RSTRLENGTH
+                ;
+terminal String IGUAL, TERNARIO;
+terminal String IGUALACION;
 terminal String IDENTIFICADOR;
 
 non terminal ini;
-non terminal LinkedList<Instruccion> instrucciones;
-non terminal LinkedList<Instruccion> bloque; 
-non terminal Instruccion llamada, primitivo;
-non terminal Instruccion instruccion;
-non terminal Instruccion expresion_numerica;
-non terminal Instruccion expresion,expresion_relacional;
-non terminal Instruccion expresion_logica;
+non terminal LinkedList<NodoAST> instrucciones;
+non terminal LinkedList<NodoAST> bloque; 
+non terminal NodoAST llamada, primitivo;
+non terminal NodoAST instruccion;
+non terminal NodoAST expresion_numerica;
+non terminal NodoAST expresion,expresion_relacional;
+non terminal NodoAST expresion_logica;
+
+precedence left OR;
+precedence left AND;
+
+precedence left IGUALACION,
+                DIFERENCIACION ,
+                MENQUE          ,
+                MAYQUE          ,
+                MENIGUAL        ,
+                MAYIGUAL        ;
 
 precedence left MAS,MENOS;
-precedence left POR,DIV;
-precedence right UMENOS; 
+precedence left POR,DIV,MOD;
+precedence right POT;
 
+precedence right UMENOS; 
+precedence right NOT;
 start with ini;
 
 ini::= instrucciones:a{:
@@ -71,7 +123,7 @@ ini::= instrucciones:a{:
 ;
 
 instrucciones ::= instrucciones:a instruccion:b{:RESULT = a; RESULT.add(b);:}
-                | instruccion:a{:RESULT = new LinkedList<>();RESULT.add(a):}
+                | instruccion:a{:RESULT = new LinkedList<>();RESULT.add(a);:}
                 
 ;
 
@@ -81,11 +133,10 @@ instruccion ::=
         | RIF PARIZQ expresion_logica:a PARDER bloque:b             {:RESULT = new If();:}
     ;
 expresion ::= 
-    expresion_numerica
+      expresion_numerica
     | expresion_logica
-    | expresion_numerica
+    | expresion_relacional
     | PARIZQ expresion PARDER
-    | llamada
     | primitivo
     ;
 
@@ -103,7 +154,7 @@ expresion_relacional::=
     |expresion:a MENQUE expresion:b                 {:return new ExpresionRelacional(OperadorRelacional.MENQUE,a,b);:}
     |expresion:a MENIGUAL expresion:b               {:return new ExpresionRelacional(OperadorRelacional.MENIGUAL,a,b);:}
     |expresion:a IGUALACION expresion:b             {:return new ExpresionRelacional(OperadorRelacional.IGUALACION,a,b);:}
-    |expresion:a DIFERIENCIACION expresion:b        {:return new ExpresionRelacional(OperadorRelacional.DIFERIENCIACION,a,b);:}
+    |expresion:a DIFERENCIACION expresion:b        {:return new ExpresionRelacional(OperadorRelacional.DIFERENCIACION,a,b);:}
     ;
 expresion_logica::=
     expresion:a OR expresion                        {:return new ExpresionLogica(OperadorRelacional.OR,a,b);:}

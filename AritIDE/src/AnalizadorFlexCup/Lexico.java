@@ -6,6 +6,8 @@
 package AnalizadorFlexCup;
 import java_cup.runtime.*;
 import java.util.*;
+import GUI.Ventana;
+import TablaDeSimbolos.NodoError;
 
 /*Declaraciones*/
 

@@ -37,7 +37,7 @@ public class Ventana extends javax.swing.JFrame {
      * Creates new form Ventana
      */
     public static JTextPane entrada; 
-    public static LinkedList<NodoError> Errores;
+    public static LinkedList<NodoError> Error;
     LinkedList<String> nombrePestanas;
     boolean guardado;
     String nombre, path;
