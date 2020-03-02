@@ -16,28 +16,39 @@ import java.util.Map;
 public class TablaDeSimbolos {
     private Map<String, Simbolo > tabla;
     private TablaDeSimbolos anterior;
-    private LinkedList<Funcion> funciones;
 
     public TablaDeSimbolos(TablaDeSimbolos anterior) {
         this.tabla = new HashMap<String, Simbolo>();
         this.anterior = anterior;
-        this.funciones = new LinkedList<Funcion>();
     }
     
-    public void setVariable(Simbolo simbolo){
-        
+    public boolean setLocal(Simbolo simbolo){
+        Simbolo encontrado = this.tabla.get(simbolo.getIdentificador());
+        if(encontrado!=null){
+            this.tabla.put(simbolo.getIdentificador(), simbolo);
+            return true;
+        }else{
+            return false;
+        }
     }
-    
+    public boolean setGlobal(String id, Simbolo simbolo){
+        for(TablaDeSimbolos e = this; e!=null;e = e.getAnterior()){
+            Simbolo encontrado = e.tabla.get(id);
+            if(encontrado!=null){
+                e.tabla.put(id, simbolo);
+            }
+            return true;
+        }
+        return false;
+    }
     public Simbolo getVariable(String id){
-        Simbolo encontrado = new Simbolo();
-        return encontrado;
-    }
-    
-    public void setFuncion(Funcion f){
-        
-    }
-    
-    public Funcion getFuncion(String id){
+        Simbolo encontrado;
+        for(TablaDeSimbolos e = this;e!=null;e=e.anterior){
+            encontrado = e.tabla.get(id);
+            if(encontrado!=null){
+                return encontrado;
+            }
+        }
         return null;
     }
     

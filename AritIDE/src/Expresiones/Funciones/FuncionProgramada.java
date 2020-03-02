@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Instrucciones;
+package Expresiones.Funciones;
 
-import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
 
 /**
  *
  * @author inti_
  */
-public class If implements NodoAST{
-
+public class FuncionProgramada extends Funcion{
+    
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

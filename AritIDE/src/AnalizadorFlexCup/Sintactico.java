@@ -6,9 +6,16 @@
 package AnalizadorFlexCup;
 
 import AST.NodoAST;
+import Estructuras.Primitivo;
+import Expresiones.ExpresionLogica;
+import Expresiones.ExpresionNumerica;
+import Expresiones.ExpresionRelacional;
 import java_cup.runtime.*;
 import java.util.*;
 import GUI.Ventana;
+import Instrucciones.If;
+import Expresiones.Funciones.Print;
+import TablaDeSimbolos.Asignacion;
 import TablaDeSimbolos.NodoError;
 import java_cup.runtime.XMLElement;
 

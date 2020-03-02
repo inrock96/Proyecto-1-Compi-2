@@ -3,20 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Instrucciones;
+package Expresiones;
 
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
+import TablaDeSimbolos.Tipo;
 
 /**
  *
  * @author inti_
  */
-public class If implements NodoAST{
+public class Primitivo implements NodoAST{
+    private Tipo tipo;
+    Object valor;
 
-    @Override
-    public Object ejecutar(TablaDeSimbolos ts) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Primitivo(Tipo tipo, Object valor) {
+        this.tipo = tipo;
+        this.valor = valor;
     }
     
+    @Override
+    public Object ejecutar(TablaDeSimbolos ts) {
+        return null;
+    }
 }

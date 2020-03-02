@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Instrucciones;
+package Expresiones;
 
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
@@ -12,11 +12,12 @@ import TablaDeSimbolos.TablaDeSimbolos;
  *
  * @author inti_
  */
-public class If implements NodoAST{
-
-    @Override
-    public Object ejecutar(TablaDeSimbolos ts) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+public abstract class Expresion implements NodoAST{
+    
+    private Object valor;
+    
+    public Object getValor(){
+        return valor;
     }
     
 }

@@ -42,6 +42,7 @@ import AST.NodoAST;
         "print" { return new Symbol(sym.RPRINT,yyline,yychar,yytext());}
         "switch" { return new Symbol(sym.RSWITCH,yyline,yychar,yytext());}
         "case" { return new Symbol(sym.RCASE,yyline,yychar,yytext());}
+        "default" {return new Symbol(sym.RDEFAULT,yyline,yychar,yytext());}
         "while" { return new Symbol(sym.RWHILE,yyline,yychar,yytext());}
         "do" { return new Symbol(sym.RDO,yyline,yychar,yytext());}
         "for" { return new Symbol(sym.RFOR,yyline,yychar,yytext());}
@@ -50,7 +51,9 @@ import AST.NodoAST;
         "continue" { return new Symbol(sym.RCONTINUE,yyline,yychar,yytext());}
         "return" { return new Symbol(sym.RRETURN,yyline,yychar,yytext());}
         "function" { return new Symbol(sym.RFUNC,yyline,yychar,yytext());}
-        "c" { return new Symbol(sym.RC,yyline,yychar,yytext());}
+        "true" { return new Symbol(sym.RTRUE,yyline,yychar,yytext());}
+        "false" { return new Symbol(sym.RFALSE,yyline,yychar,yytext());}
+        /* "c" { return new Symbol(sym.RC,yyline,yychar,yytext());}
         "typeof" { return new Symbol(sym.RTYPEOF,yyline,yychar,yytext());}
         "length" { return new Symbol(sym.RLENGTH,yyline,yychar,yytext());}
         "ncol" { return new Symbol(sym.RNCOL,yyline,yychar,yytext());}
@@ -70,7 +73,7 @@ import AST.NodoAST;
         "pie" { return new Symbol(sym.RPIE,yyline,yychar,yytext());}
         "barplot" { return new Symbol(sym.RBARPLOT,yyline,yychar,yytext());}
         "plot" { return new Symbol(sym.RPLOT,yyline,yychar,yytext());}
-        "hist" { return new Symbol(sym.RHIST,yyline,yychar,yytext());}
+        "hist" { return new Symbol(sym.RHIST,yyline,yychar,yytext());} */
         
         //----->Simbolos
 

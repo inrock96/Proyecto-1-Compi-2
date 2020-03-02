@@ -10,5 +10,30 @@ package TablaDeSimbolos;
  * @author inti_
  */
 public class Tipo {
-    
+    public enum Tipos{
+        INTEGER,
+        NUMERIC,
+        STRING,
+        VECTOR,
+        LIST,
+        MATRIX,
+        ARRAY
+    }
+    public enum Operador{
+        MAS,
+        MENOS,
+        MENOSUNARIO,
+        POR,
+        DIV,
+        MOD,
+        POT,
+        MAYOR,
+        MENOR,
+        MAYIGUAL,
+        MENIGUAL,
+        AND,
+        OR,
+        IGUALACION,
+        DIFERENCIACION
+    }
 }

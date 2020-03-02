@@ -5,10 +5,17 @@
  */
 package Expresiones;
 
+import TablaDeSimbolos.TablaDeSimbolos;
+
 /**
  *
  * @author inti_
  */
-public class ExpresionLogica {
+public class ExpresionLogica extends Expresion{
+    
+    @Override
+    public Object ejecutar(TablaDeSimbolos ts) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

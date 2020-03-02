@@ -42,7 +42,7 @@ public class Ventana extends javax.swing.JFrame {
     boolean guardado;
     String nombre, path;
     public Ventana() {
-        Errores = new LinkedList<>();
+        Error = new LinkedList<>();
         nombrePestanas = new LinkedList<>();
         initComponents();
         LineaText tmpL = new LineaText();

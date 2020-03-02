@@ -2,10 +2,21 @@
 //Imports
 
 package AnalizadorFlexCup;
+
+import AST.NodoAST;
+import Estructuras.Primitivo;
+import Expresiones.ExpresionLogica;
+import Expresiones.ExpresionNumerica;
+import Expresiones.ExpresionRelacional;
 import java_cup.runtime.*;
 import java.util.*;
 import GUI.Ventana;
+import Instrucciones.If;
+import Expresiones.Funciones.Print;
+import TablaDeSimbolos.Asignacion;
 import TablaDeSimbolos.NodoError;
+import java_cup.runtime.XMLElement;
+
 
 parser code{:
     /**
@@ -57,34 +68,37 @@ terminal String RIMPRIMIR
                 , IGUALFUNC
                 ,DIFERENCIACION
                 ,RFOR
-                ,RPIE
+                /* ,RPIE */
                 ,RNULL
-                ,RNROW
+                /* ,RNROW
                 ,RNCOL
                 ,RLIST
-                ,RPLOT
+                ,RPLOT */
                 ,RCASE
-                ,RHIST
+                /* ,RHIST
                 ,RMEAN
                 ,RMODE
                 ,RPRINT
                 ,RROUND
                 ,RTRUNK
-                ,RARRAY
+                ,RARRAY */
                 ,RBREAK
-                ,RLENGTH
+                /*,RLENGTH*/
                 ,RSWITCH
                 ,RRETURN
-                ,RREMOVE
+                /* ,RREMOVE
                 ,RTYPEOF
                 ,RMEDIAN
                 ,RMATRIX
-                ,RBARPLOT
+                ,RBARPLOT */
                 ,RFUNC
                 ,RCONTINUE
-                ,RTOLOWER
+                /* ,RTOLOWER
                 ,RTOUPPER
-                ,RSTRLENGTH
+                ,RSTRLENGTH */
+                ,RDEFAULT
+                ,RTRUE
+                ,RFALSE
                 ;
 terminal String IGUAL, TERNARIO;
 terminal String IGUALACION;
@@ -92,9 +106,11 @@ terminal String IDENTIFICADOR;
 
 non terminal ini;
 non terminal LinkedList<NodoAST> instrucciones;
-non terminal LinkedList<NodoAST> bloque; 
+non terminal LinkedList<NodoAST> listaexpresiones;
+non terminal LinkedList<NodoAST> bloque, casos; 
 non terminal NodoAST llamada, primitivo;
 non terminal NodoAST instruccion;
+non terminal NodoAST caso;
 non terminal NodoAST expresion_numerica;
 non terminal NodoAST expresion,expresion_relacional;
 non terminal NodoAST expresion_logica;
@@ -124,14 +140,59 @@ ini::= instrucciones:a{:
 
 instrucciones ::= instrucciones:a instruccion:b{:RESULT = a; RESULT.add(b);:}
                 | instruccion:a{:RESULT = new LinkedList<>();RESULT.add(a);:}
+                | error
                 
 ;
 
 instruccion ::=
-        RIMPRIMIR PARIZQ expresion:a PARDER PTCOMA              {:RESULT = new Print();:}
-        | IDENTIFICADOR IGUAL expresion PTCOMA                  {:RESULT = new Asignacion();:}
-        | RIF PARIZQ expresion_logica:a PARDER bloque:b             {:RESULT = new If();:}
+         ntif
+        | RWHILE PARIZQ expresion:a PARDER bloque:b
+        | RSWITCH PARIZQ expresion PARDER LLAVIZQ casos defecto LLAVDER
+        | RFOR PARIZQ IDENTIFICADOR:a RIN expresion PARDER bloque
+        | IDENTIFICADOR IGUAL RFUNC PARIZQ parametros PARDER bloque
+        | IDENTIFICADOR IGUAL PARIZQ parametros PARDER IGUALFUNC bloque
+        | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA
+        | IDENTIFICADOR IGUAL expresion PTCOMA
+        | IDENTIFICADOR PARIZQ parametros PARDER PTCOMA       
+        | IDENTIFICADOR IGUAL expresion '\n';
     ;
+instruccioneslocales::= instruccioneslocales instruccionlocal
+                        |instruccionlocal
+                        ;
+instruccionlocal::=  RBREAK PTCOMA
+                    | RRETURN expresion PTCOMA
+                    | RCONTINUE PTCOMA
+                    ;
+
+ntif::= RIF PARIZQ expresion:a PARDER bloque:b             {:RESULT = new If();:}
+        | RIF PARIZQ expresion:a PARDER bloque:b elseifs
+        | RIF PARIZQ expresion:a PARDER bloque:b elseifs RELSE bloque:d
+        | RIF PARIZQ expresion:a PARDER bloque:b RELSE bloque:c
+
+listaexpresiones::= listaexpresiones COMA expresion
+                    | expresion
+                    ;
+listaparam::=   listaparam COMA param
+                | param
+                ;
+param::=IDENTIFICADOR IGUAL expresion
+        | expresion
+        ;
+casos   ::= casos caso
+            caso
+            ;
+caso    ::= RCASE expresion DOSPT instruccioneslocales
+            
+            ;
+defecto ::= RDEFAULT DOSPT instrucciones
+            ;
+elseifs ::=  elseifs elseif
+            |elseif 
+            ;
+elseif ::= RELSE RIF PARIZQ expresion PARDER bloque;
+bloque ::= LLAVIZQ instruccioneslocales:a LLAVDER {:RESULT = a;:}
+            |error
+            ;
 expresion ::= 
       expresion_numerica
     | expresion_logica
@@ -161,9 +222,20 @@ expresion_logica::=
     |expresion:a AND expresion                      {:return new ExpresionLogica(OperadorRelacional.AND,a,b);:}
     |NOT expresion:a                                {:return new ExpresionLogica(OperadorRelacional.NOT,a);:}
     ;
+idarreglo::= IDENTIFICADOR dimensiones
+            ;
+dimensiones::= dimensiones dimension
+            | dimension;
+dimension::= CORIZQ expresion CORDER
+            |CORIZQ CORIZQ expresion CORDER CORDER
+            ;
 primitivo::=
     NUMERO:a                                        {:return new Primitivo();:}
     |DECIMAL:a                                      {:return new Primitivo();:}
     |CADENA:a                                       {:return new Primitivo();:}
     |IDENTIFICADOR:a                                {:return new Primitivo();:}
+    |RTRUE
+    |RFALSE
+    |idarreglo
+    |llamada
     ;

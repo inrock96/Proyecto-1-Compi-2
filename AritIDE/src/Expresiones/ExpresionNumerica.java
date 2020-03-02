@@ -5,10 +5,62 @@
  */
 package Expresiones;
 
+import AST.NodoAST;
+import TablaDeSimbolos.TablaDeSimbolos;
+import TablaDeSimbolos.Tipo;
+import TablaDeSimbolos.Tipo.Operador;
+
 /**
  *
  * @author inti_
  */
-public class ExpresionNumerica {
+public class ExpresionNumerica extends Expresion{
+    private Expresion operando1;
+    private Expresion operando2;
+    private Expresion operandoU;
+    Tipo.Operador operador;
+
+    public ExpresionNumerica(Expresion operando1, Expresion operando2, Tipo.Operador operador) {
+        this.operando1 = operando1;
+        this.operando2 = operando2;
+        this.operandoU = operandoU;
+        this.operador = operador;
+    }
+
+    public ExpresionNumerica( Expresion operandoU) {
+        this.operandoU = operandoU;
+    }
+    
+    
+    @Override
+    public Object ejecutar(TablaDeSimbolos ts) {
+        Object izquierdo,derecho,unario=null;
+        
+        if(this.operandoU==null){
+            izquierdo = operando1.ejecutar(ts);
+            derecho = operando2.ejecutar(ts);
+            if(izquierdo==null||derecho==null)  return null;
+        }else{
+            unario= operandoU.ejecutar(ts);
+            if(unario==null)    return null;
+        }
+        
+        if(this.operador==Operador.MAS){
+            
+        }else if(this.operador==Operador.MENOS){
+            
+        }else if(this.operador==Operador.POR){
+            
+        }else if(this.operador==Operador.DIV){
+            
+        }else if(this. operador==Operador.MOD){
+            
+        }else if(this.operador==Operador.POT){
+            
+        }else if(this.operador==Operador.MENOSUNARIO){
+            
+        }
+        return null;
+    }
     
 }

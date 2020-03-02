@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package TablaDeSimbolos;
+package Expresiones.Funciones;
 
 /**
  *
  * @author inti_
  */
-public class Funcion {
+public class Trunk {
     
 }

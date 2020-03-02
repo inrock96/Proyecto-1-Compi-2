@@ -3,18 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package AST;
-
-import java.util.ArrayList;
+package Expresiones.Funciones;
 
 /**
  *
  * @author inti_
  */
-public class AST {
-        ArrayList<NodoAST> instrucciones;
-
-    public AST() {
-    }
-        
+public class Length {
+    
 }
