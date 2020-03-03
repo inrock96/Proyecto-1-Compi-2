@@ -14,6 +14,7 @@ public class Tipo {
         INTEGER,
         NUMERIC,
         STRING,
+        BOOLEANO,
         VECTOR,
         LIST,
         MATRIX,
@@ -34,6 +35,7 @@ public class Tipo {
         AND,
         OR,
         IGUALACION,
-        DIFERENCIACION
+        DIFERENCIACION,
+        NOT
     }
 }

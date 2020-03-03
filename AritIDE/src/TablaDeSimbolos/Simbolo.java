@@ -13,19 +13,22 @@ public class Simbolo {
     
     private final String identificador;
     private Object valor;
-    private Tipo tipo;
+    private Tipo.Tipos tipo;
+    private int fila, columna;
 
-    public Simbolo(String identificador, Object valor, Tipo tipo) {
+    public Simbolo(String identificador, Object valor, Tipo.Tipos tipo, int fila, int columna) {
         this.identificador = identificador;
         this.valor = valor;
         this.tipo = tipo;
+        this.fila = fila;
+        this.columna = columna;
     }
 
     public String getIdentificador() {
         return identificador;
     }
 
-    public Tipo getTipo() {
+    public Tipo.Tipos getTipo() {
         return tipo;
     }
 
@@ -33,7 +36,7 @@ public class Simbolo {
         return valor;
     }
 
-    public void setTipo(Tipo tipo) {
+    public void setTipo(Tipo.Tipos tipo) {
         this.tipo = tipo;
     }
 

@@ -4,16 +4,21 @@
 package AnalizadorFlexCup;
 
 import AST.NodoAST;
-import Estructuras.Primitivo;
+
+import Expresiones.Identificador;
+import Expresiones.Expresion;
+import Expresiones.Primitivo;
+import Expresiones.Ternario;
+import TablaDeSimbolos.Tipo;
 import Expresiones.ExpresionLogica;
 import Expresiones.ExpresionNumerica;
 import Expresiones.ExpresionRelacional;
+import Instrucciones.Asignacion;
 import java_cup.runtime.*;
 import java.util.*;
 import GUI.Ventana;
 import Instrucciones.If;
 import Expresiones.Funciones.Print;
-import TablaDeSimbolos.Asignacion;
 import TablaDeSimbolos.NodoError;
 import java_cup.runtime.XMLElement;
 
@@ -58,11 +63,11 @@ terminal String NUMERO;
 terminal String DECIMAL;
 terminal String CADENA;
 terminal String UMENOS;
-terminal String RIMPRIMIR
-                ,RWHILE
+terminal String /* RIMPRIMIR 
+                ,*/RWHILE
                 ,RIF
-                ,RELSE
-                ,RC
+                ,RELSE/* 
+                ,RC */
                 ,RIN
                 , RDO
                 , IGUALFUNC
@@ -106,14 +111,15 @@ terminal String IDENTIFICADOR;
 
 non terminal ini;
 non terminal LinkedList<NodoAST> instrucciones;
-non terminal LinkedList<NodoAST> listaexpresiones;
-non terminal LinkedList<NodoAST> bloque, casos; 
-non terminal NodoAST llamada, primitivo;
+non terminal LinkedList<NodoAST> listaexpresiones, instruccioneslocales, elseifs;
+non terminal LinkedList<NodoAST> bloque, casos,listaparam, parametros, dimensiones; 
+non terminal NodoAST llamada, instruccionlocal, elseif;
 non terminal NodoAST instruccion;
-non terminal NodoAST caso;
-non terminal NodoAST expresion_numerica;
-non terminal NodoAST expresion,expresion_relacional;
-non terminal NodoAST expresion_logica;
+non terminal NodoAST ntif, idarreglo,dimension;
+non terminal NodoAST caso, defecto,param,asignacion;
+non terminal Expresion expresion_numerica,primitivo;
+non terminal Expresion expresion,expresion_relacional;
+non terminal Expresion expresion_logica;
 
 precedence left OR;
 precedence left AND;
@@ -128,9 +134,10 @@ precedence left IGUALACION,
 precedence left MAS,MENOS;
 precedence left POR,DIV,MOD;
 precedence right POT;
-
+precedence right TERNARIO;
 precedence right UMENOS; 
 precedence right NOT;
+precedence right IGUAL;
 start with ini;
 
 ini::= instrucciones:a{:
@@ -144,17 +151,19 @@ instrucciones ::= instrucciones:a instruccion:b{:RESULT = a; RESULT.add(b);:}
                 
 ;
 
+llamada::= IDENTIFICADOR PARIZQ listaexpresiones PARDER
+            ;
+
 instruccion ::=
          ntif
         | RWHILE PARIZQ expresion:a PARDER bloque:b
         | RSWITCH PARIZQ expresion PARDER LLAVIZQ casos defecto LLAVDER
         | RFOR PARIZQ IDENTIFICADOR:a RIN expresion PARDER bloque
-        | IDENTIFICADOR IGUAL RFUNC PARIZQ parametros PARDER bloque
-        | IDENTIFICADOR IGUAL PARIZQ parametros PARDER IGUALFUNC bloque
-        | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA
-        | IDENTIFICADOR IGUAL expresion PTCOMA
-        | IDENTIFICADOR PARIZQ parametros PARDER PTCOMA       
-        | IDENTIFICADOR IGUAL expresion '\n';
+        | IDENTIFICADOR IGUAL RFUNC PARIZQ listaparam PARDER bloque     //metodo
+        | IDENTIFICADOR IGUAL PARIZQ listaparam PARDER IGUALFUNC bloque //metodo
+        | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA  
+        | asignacion PTCOMA
+        | IDENTIFICADOR PARIZQ parametros PARDER PTCOMA     //llamada
     ;
 instruccioneslocales::= instruccioneslocales instruccionlocal
                         |instruccionlocal
@@ -168,16 +177,18 @@ ntif::= RIF PARIZQ expresion:a PARDER bloque:b             {:RESULT = new If();:
         | RIF PARIZQ expresion:a PARDER bloque:b elseifs
         | RIF PARIZQ expresion:a PARDER bloque:b elseifs RELSE bloque:d
         | RIF PARIZQ expresion:a PARDER bloque:b RELSE bloque:c
-
+        ;
 listaexpresiones::= listaexpresiones COMA expresion
                     | expresion
                     ;
 listaparam::=   listaparam COMA param
                 | param
                 ;
-param::=IDENTIFICADOR IGUAL expresion
-        | expresion
+param::=asignacion
         ;
+asignacion::= IDENTIFICADOR:a IGUAL expresion:b         {:RESULT = new Asignacion(a,b,aleft,aright);:}
+            |idarreglo:a IGUAL expresion:b          {:RESULT = new Asignacion(a,b,aleft,aright);:}
+            ;
 casos   ::= casos caso
             caso
             ;
@@ -194,35 +205,38 @@ bloque ::= LLAVIZQ instruccioneslocales:a LLAVDER {:RESULT = a;:}
             |error
             ;
 expresion ::= 
-      expresion_numerica
-    | expresion_logica
-    | expresion_relacional
-    | PARIZQ expresion PARDER
-    | primitivo
+      expresion_numerica:a                          {:RESULT = a;:}
+    | expresion_logica:a                            {:RESULT = a;:}
+    | expresion_relacional:a                        {:RESULT = a;:}
+    | PARIZQ expresion:a PARDER                     {:RESULT = a;:}
+    | primitivo:a                                   {:RESULT = a;:}
     ;
 
 expresion_numerica::=
-    expresion:a MAS expresion:b                     {:return new ExpresionNumerica(OperadorAritmetico.MAS,a,b);:}
-    |expresion:a MENOS expresion:b                  {:return new ExpresionNumerica(OperadorAritmetico.MENOS,a,b);:}
-    |expresion:a POR expresion:b                    {:return new ExpresionNumerica(OperadorAritmetico.POR,a,b);:}
-    |expresion:a DIV expresion:b                    {:return new ExpresionNumerica(OperadorAritmetico.DIV,a,b);:}
-    |expresion:a POT expresion:b                    {:return new ExpresionNumerica(OperadorAritmetico.POT,a,b);:}                                                    {:return a;:}
-    |MENOS expresion:a                              {:return new ExpresionNumerica(OperadorAritmetico.MENOS,a);:}%prec UMENOS
+    expresion:a MAS expresion:b                     {:RESULT= new ExpresionNumerica(a,b,Tipo.Operador.MAS,aleft,aright);:}
+    |expresion:a MENOS expresion:b                  {:RESULT=new ExpresionNumerica(a,b,Tipo.Operador.MENOS,aleft,aright);:}
+    |expresion:a POR expresion:b                    {:RESULT=new ExpresionNumerica(a,b,Tipo.Operador.POR,aleft,aright);:}
+    |expresion:a MOD expresion:b                    {:RESULT=new ExpresionNumerica(a,b,Tipo.Operador.MOD,aleft,aright);:}
+    |expresion:a DIV expresion:b                    {:RESULT=new ExpresionNumerica(a,b,Tipo.Operador.DIV,aleft,aright);:}
+    |expresion:a POT expresion:b                    {:RESULT=new ExpresionNumerica(a,b,Tipo.Operador.POT,aleft,aright);:}
+    |MENOS expresion:a                              {:RESULT=new ExpresionNumerica(a,Tipo.Operador.MENOSUNARIO,aleft,aright);:}%prec UMENOS
     ;
+
 expresion_relacional::=
-    expresion:a MAYQUE expresion:b                  {:return new ExpresionRelacional(OperadorRelacional.MAYQUE,a,b);:}
-    |expresion:a MAYIGUAL expresion:b               {:return new ExpresionRelacional(OperadorRelacional.MAYIGUAL,a,b);:}
-    |expresion:a MENQUE expresion:b                 {:return new ExpresionRelacional(OperadorRelacional.MENQUE,a,b);:}
-    |expresion:a MENIGUAL expresion:b               {:return new ExpresionRelacional(OperadorRelacional.MENIGUAL,a,b);:}
-    |expresion:a IGUALACION expresion:b             {:return new ExpresionRelacional(OperadorRelacional.IGUALACION,a,b);:}
-    |expresion:a DIFERENCIACION expresion:b        {:return new ExpresionRelacional(OperadorRelacional.DIFERENCIACION,a,b);:}
+    expresion:a MAYQUE expresion:b                  {:RESULT= new ExpresionRelacional(a,b,Tipo.Operador.MAYOR,aleft,aright);:}
+    |expresion:a MAYIGUAL expresion:b               {:RESULT= new ExpresionRelacional(a,b,Tipo.Operador.MAYIGUAL,aleft,aright);:}
+    |expresion:a MENQUE expresion:b                 {:RESULT= new ExpresionRelacional(a,b,Tipo.Operador.MENOR,aleft,aright);:}
+    |expresion:a MENIGUAL expresion:b               {:RESULT= new ExpresionRelacional(a,b,Tipo.Operador.MENIGUAL,aleft,aright);:}
+    |expresion:a IGUALACION expresion:b             {:RESULT= new ExpresionRelacional(a,b,Tipo.Operador.IGUALACION,aleft,aright);:}
+    |expresion:a DIFERENCIACION expresion:b        {:RESULT= new ExpresionRelacional(a,b,Tipo.Operador.DIFERENCIACION,aleft,aright);:}
     ;
 expresion_logica::=
-    expresion:a OR expresion                        {:return new ExpresionLogica(OperadorRelacional.OR,a,b);:}
-    |expresion:a AND expresion                      {:return new ExpresionLogica(OperadorRelacional.AND,a,b);:}
-    |NOT expresion:a                                {:return new ExpresionLogica(OperadorRelacional.NOT,a);:}
+    expresion:a OR expresion:b                        {:RESULT = new ExpresionLogica(a,b,Tipo.Operador.OR,aleft,aright);:}
+    |expresion:a AND expresion:b                      {:RESULT = new ExpresionLogica(a,b,Tipo.Operador.AND,aleft,aright);:}
+    |NOT expresion:a                                {:RESULT = new ExpresionLogica(a,Tipo.Operador.NOT,aleft,aright);:}
+    |expresion:a TERNARIO expresion:b DOSPT expresion:c   {:RESULT = new Ternario(a,b,c,aleft,aright);:}
     ;
-idarreglo::= IDENTIFICADOR dimensiones
+idarreglo::= IDENTIFICADOR dimensiones              
             ;
 dimensiones::= dimensiones dimension
             | dimension;
@@ -230,12 +244,13 @@ dimension::= CORIZQ expresion CORDER
             |CORIZQ CORIZQ expresion CORDER CORDER
             ;
 primitivo::=
-    NUMERO:a                                        {:return new Primitivo();:}
-    |DECIMAL:a                                      {:return new Primitivo();:}
-    |CADENA:a                                       {:return new Primitivo();:}
-    |IDENTIFICADOR:a                                {:return new Primitivo();:}
-    |RTRUE
-    |RFALSE
-    |idarreglo
-    |llamada
+    NUMERO:a                                        {:RESULT = new Primitivo(Integer.parseInt(a),Tipo.Tipos.INTEGER,aleft,aright);:}
+    |DECIMAL:a                                      {:RESULT = new Primitivo(Double.parseDouble(a),Tipo.Tipos.NUMERIC,aleft,aright);:}
+    |CADENA:a                                       {:RESULT = new Primitivo(a,Tipo.Tipos.STRING,aleft,aright);:}
+    |IDENTIFICADOR:a                                {:RESULT= new Identificador(a,aleft,aright);:}
+    |RTRUE:a                                          {:RESULT = new Primitivo(true,Tipo.Tipos.BOOLEANO,aleft,aright);:}
+    |RFALSE:a                                         {:RESULT = new Primitivo(false,Tipo.Tipos.BOOLEANO,aleft,aright);:}
+    |RNULL                                          {:RESULT = null;:}
+    |idarreglo                                      
+    |llamada                                            
     ;

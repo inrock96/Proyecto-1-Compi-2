@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Estructuras;
+package Expresiones;
 
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
@@ -13,21 +13,12 @@ import TablaDeSimbolos.Tipo;
  *
  * @author inti_
  */
-public class Primitivo implements NodoAST{
-    private Object valor;
+public class Llamada implements NodoAST{
     Tipo.Tipos tipo;
-    int fila,columna;
-
-    public Primitivo(Object valor, Tipo.Tipos tipo, int fila, int columna) {
-        this.valor = valor;
-        this.tipo = tipo;
-        this.fila = fila;
-        this.columna = columna;
-    }
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
-        return this.valor;
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

@@ -18,17 +18,21 @@ public class ExpresionNumerica extends Expresion{
     private Expresion operando1;
     private Expresion operando2;
     private Expresion operandoU;
+    private int fila, columna;
     Tipo.Operador operador;
 
-    public ExpresionNumerica(Expresion operando1, Expresion operando2, Tipo.Operador operador) {
+    public ExpresionNumerica(Expresion operando1, Expresion operando2, Tipo.Operador operador, int fila, int columna) {
         this.operando1 = operando1;
         this.operando2 = operando2;
-        this.operandoU = operandoU;
         this.operador = operador;
+        this.fila = fila;
+        this.columna = columna;
     }
 
-    public ExpresionNumerica( Expresion operandoU) {
+    public ExpresionNumerica( Expresion operandoU,int fila, int columna) {
         this.operandoU = operandoU;
+        this.fila = fila;
+        this.columna = columna;
     }
     
     

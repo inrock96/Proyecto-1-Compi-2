@@ -7,6 +7,7 @@ package Expresiones;
 
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
+import TablaDeSimbolos.Tipo;
 
 /**
  *
@@ -15,9 +16,12 @@ import TablaDeSimbolos.TablaDeSimbolos;
 public abstract class Expresion implements NodoAST{
     
     private Object valor;
-    
+    Tipo.Tipos tipo;
     public Object getValor(){
         return valor;
+    }
+    public Tipo.Tipos getTipo(){
+        return tipo;
     }
     
 }

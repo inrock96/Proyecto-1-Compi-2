@@ -39,7 +39,6 @@ import AST.NodoAST;
         "null" { return new Symbol(sym.RNULL,yyline,yychar,yytext());}
         "if" { return new Symbol(sym.RIF,yyline,yychar,yytext());}
         "else" { return new Symbol(sym.RELSE,yyline,yychar,yytext());}
-        "print" { return new Symbol(sym.RPRINT,yyline,yychar,yytext());}
         "switch" { return new Symbol(sym.RSWITCH,yyline,yychar,yytext());}
         "case" { return new Symbol(sym.RCASE,yyline,yychar,yytext());}
         "default" {return new Symbol(sym.RDEFAULT,yyline,yychar,yytext());}

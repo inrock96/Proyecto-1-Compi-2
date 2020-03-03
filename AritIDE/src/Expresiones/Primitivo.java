@@ -13,17 +13,21 @@ import TablaDeSimbolos.Tipo;
  *
  * @author inti_
  */
-public class Primitivo implements NodoAST{
-    private Tipo tipo;
-    Object valor;
+public class Primitivo extends Expresion{
+    private Object valor;
+    Tipo.Tipos tipo;
+    int fila,columna;
 
-    public Primitivo(Tipo tipo, Object valor) {
-        this.tipo = tipo;
+    public Primitivo(Object valor, Tipo.Tipos tipo, int fila, int columna) {
         this.valor = valor;
+        this.tipo = tipo;
+        this.fila = fila;
+        this.columna = columna;
     }
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
-        return null;
+        return this.valor;
     }
+    
 }

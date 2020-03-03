@@ -22,22 +22,17 @@ public class TablaDeSimbolos {
         this.anterior = anterior;
     }
     
-    public boolean setLocal(Simbolo simbolo){
-        Simbolo encontrado = this.tabla.get(simbolo.getIdentificador());
-        if(encontrado!=null){
+    public void setLocal(Simbolo simbolo){
             this.tabla.put(simbolo.getIdentificador(), simbolo);
-            return true;
-        }else{
-            return false;
-        }
+        
     }
     public boolean setGlobal(String id, Simbolo simbolo){
         for(TablaDeSimbolos e = this; e!=null;e = e.getAnterior()){
             Simbolo encontrado = e.tabla.get(id);
             if(encontrado!=null){
-                e.tabla.put(id, simbolo);
+                e.tabla.put(id, simbolo);                
+                return true;
             }
-            return true;
         }
         return false;
     }
