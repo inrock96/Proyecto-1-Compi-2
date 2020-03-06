@@ -5,22 +5,41 @@
  */
 package TablaDeSimbolos;
 
-import Expresiones.Funciones.Funcion;
+import Expresiones.Funciones.*;
+import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  *
  * @author inti_
  */
 public class Singleton {
-    private static LinkedList<Funcion> funciones;
+    private static Map funciones ;
+    private static Singleton singleton=null;
     private Singleton(){
-        funciones = new LinkedList<>();
+        
+        funciones = new Hashtable();
     }
-    public static LinkedList getInstanceOf(){
-        if(funciones==null){
-            funciones = new LinkedList<>();
+    public static Singleton getInstanceOf(){
+        if(singleton==null){
+            singleton = new Singleton();
+            
+            crearNativas();
         }
-        return funciones;
+        return singleton;
     }
+    private static void crearNativas(){
+        Print imprimir = new Print("print");
+        funciones.put("print", imprimir);
+    }
+    public static void addFuncion(FuncionProgramada f){
+        funciones.put(f.getId(),f);
+    }   
+    public static Funcion getFuncion(String id){
+        return (Funcion)funciones.get(id);
+    }
+
+    
+    
 }

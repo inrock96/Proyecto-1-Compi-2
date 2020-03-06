@@ -13,21 +13,21 @@ import TablaDeSimbolos.TablaDeSimbolos;
  *
  * @author inti_
  */
-public class Print extends Funcion{
-    int fila,col;
+public class Print extends FuncionPropia{
+    String id;
     Expresion expresion;
 
-    public Print(int fila, int col, Expresion expresion) {
-        this.fila = fila;
-        this.col = col;
-        this.expresion = expresion;
+    public Print(String id) {
+        super(id);
     }
+    
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
         
-        expresion.ejecutar(ts);
-        Ventana.entrada.setText(Ventana.entrada.getText()+expresion.getValor()+"\n");
+        Object valor  = expresion.ejecutar(ts);
+        
+        Ventana.entrada.setText(Ventana.entrada.getText()+valor+"\n");
         return null;
     }
     

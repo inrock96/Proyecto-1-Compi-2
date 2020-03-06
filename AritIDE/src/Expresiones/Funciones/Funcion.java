@@ -6,6 +6,10 @@
 package Expresiones.Funciones;
 
 import AST.NodoAST;
+import Estructuras.Arreglo;
+import Estructuras.Lista;
+import Estructuras.Matriz;
+import TablaDeSimbolos.Tipo;
 
 /**
  *

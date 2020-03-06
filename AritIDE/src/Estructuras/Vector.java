@@ -5,6 +5,7 @@
  */
 package Estructuras;
 
+import Expresiones.Expresion;
 import TablaDeSimbolos.Tipo;
 import java.util.ArrayList;
 
@@ -13,12 +14,25 @@ import java.util.ArrayList;
  * @author inti_
  */
 public class Vector {
-    private Tipo tipo;
+    private Tipo.Tipos tipo;
     private int tamano;
     private Object[] valores;
-    public Vector(Tipo tipo, Object[] valor, int tamano) {
+    
+    public Vector(Tipo.Tipos tipo, Object[] valores, int tamano) {
         this.tipo = tipo;
         this.valores = valores;
         this.tamano = tamano;
+    }
+    
+    public void setValor(Expresion valor, int posicion){
+        if(posicion<tamano&&posicion>-1){
+            if(valor.getTipo()==this.tipo){
+                valores[posicion]=valor.getValor();
+            }else{
+                //Error de tipo
+            }
+        }else{
+            //error de acceso
+        }
     }
 }

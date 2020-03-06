@@ -26,6 +26,10 @@ public class Asignacion implements NodoAST{
         this.fila = fila;
         this.columna = columna;
     }
+
+    public Asignacion(NodoAST a, Expresion b, int aleft, int aright) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {

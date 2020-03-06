@@ -6,15 +6,22 @@
 package AST;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  *
  * @author inti_
  */
 public class AST {
-        ArrayList<NodoAST> instrucciones;
+        LinkedList<NodoAST> instrucciones;
 
-    public AST() {
+    public AST(LinkedList<NodoAST> instrucciones) {
+        this.instrucciones = instrucciones;
     }
+
+    public LinkedList<NodoAST> getInstrucciones() {
+        return instrucciones;
+    }
+    
         
 }

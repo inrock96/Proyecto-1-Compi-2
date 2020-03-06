@@ -111,8 +111,8 @@ terminal String IDENTIFICADOR;
 
 non terminal ini;
 non terminal LinkedList<NodoAST> instrucciones;
-non terminal LinkedList<NodoAST> listaexpresiones, instruccioneslocales, elseifs;
-non terminal LinkedList<NodoAST> bloque, casos,listaparam, parametros, dimensiones; 
+non terminal LinkedList<NodoAST> listaexpresiones, instruccioneslocales, elseifs, parametros;
+non terminal LinkedList<NodoAST> bloque, casos,listaparam, dimensiones; 
 non terminal NodoAST llamada, instruccionlocal, elseif;
 non terminal NodoAST instruccion;
 non terminal NodoAST ntif, idarreglo,dimension;
@@ -147,12 +147,9 @@ ini::= instrucciones:a{:
 
 instrucciones ::= instrucciones:a instruccion:b{:RESULT = a; RESULT.add(b);:}
                 | instruccion:a{:RESULT = new LinkedList<>();RESULT.add(a);:}
-                | error
+                
                 
 ;
-
-llamada::= IDENTIFICADOR PARIZQ listaexpresiones PARDER
-            ;
 
 instruccion ::=
          ntif
@@ -160,17 +157,55 @@ instruccion ::=
         | RSWITCH PARIZQ expresion PARDER LLAVIZQ casos defecto LLAVDER
         | RFOR PARIZQ IDENTIFICADOR:a RIN expresion PARDER bloque
         | IDENTIFICADOR IGUAL RFUNC PARIZQ listaparam PARDER bloque     //metodo
-        | IDENTIFICADOR IGUAL PARIZQ listaparam PARDER IGUALFUNC bloque //metodo
+        | IDENTIFICADOR IGUAL RFUNC PARIZQ  PARDER bloque     //metodo
+        | parametros PARDER IGUALFUNC bloque
+        | IDENTIFICADOR IGUAL IDENTIFICADOR PARIZQ PARDER IGUALFUNC bloque
+        | IDENTIFICADOR IGUAL PARIZQ PARDER IGUALFUNC bloque
         | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA  
         | asignacion PTCOMA
-        | IDENTIFICADOR PARIZQ parametros PARDER PTCOMA     //llamada
+        | llamada PTCOMA
+        | llamada
+        | RDO bloque:a RWHILE PARIZQ expresion:b PARDER   
+        | asignacion 
+        | error PTCOMA
+        | error LLAVDER
     ;
+llamada::= IDENTIFICADOR PARIZQ listaexpresiones PARDER      //llamada
+            |IDENTIFICADOR PARIZQ  PARDER
+            ;
+parametros::=IDENTIFICADOR IGUAL PARIZQ IDENTIFICADOR COMA listaparam
+            | IDENTIFICADOR IGUAL PARIZQ IDENTIFICADOR IGUAL expresion COMA listaparam
+            |IDENTIFICADOR IGUAL PARIZQ IDENTIFICADOR IGUAL expresion
+            ;
 instruccioneslocales::= instruccioneslocales instruccionlocal
                         |instruccionlocal
                         ;
+
 instruccionlocal::=  RBREAK PTCOMA
-                    | RRETURN expresion PTCOMA
+                    | RRETURN PARIZQ expresion PARDER PTCOMA
+                    | RRETURN PTCOMA
                     | RCONTINUE PTCOMA
+                    | ntif
+                    | RWHILE PARIZQ expresion:a PARDER bloque:b
+                    | RSWITCH PARIZQ expresion PARDER LLAVIZQ casos defecto LLAVDER
+                    | RFOR PARIZQ IDENTIFICADOR:a RIN expresion PARDER bloque
+                    | IDENTIFICADOR IGUAL RFUNC PARIZQ listaparam PARDER bloque     //metodo
+                    | IDENTIFICADOR IGUAL RFUNC PARIZQ  PARDER bloque     //metodo
+                    | parametros PARDER IGUALFUNC bloque
+                    | IDENTIFICADOR IGUAL IDENTIFICADOR PARIZQ PARDER IGUALFUNC bloque
+                    | IDENTIFICADOR IGUAL PARIZQ PARDER IGUALFUNC bloque
+                    | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA  
+                    | asignacion PTCOMA
+                    | IDENTIFICADOR PARIZQ listaexpresiones PARDER PTCOMA     //llamada
+                    | IDENTIFICADOR PARIZQ  PARDER PTCOMA     //llamada
+                    | RDO bloque:a RWHILE PARIZQ expresion:b PARDER   
+                    | asignacion 
+                    | IDENTIFICADOR PARIZQ listaexpresiones PARDER      //llamada
+                    | IDENTIFICADOR PARIZQ  PARDER      //llamada
+                    | RBREAK 
+                    | RRETURN PARIZQ expresion PARDER
+                    | RRETURN 
+                    | RCONTINUE 
                     ;
 
 ntif::= RIF PARIZQ expresion:a PARDER bloque:b             {:RESULT = new If();:}
@@ -184,7 +219,8 @@ listaexpresiones::= listaexpresiones COMA expresion
 listaparam::=   listaparam COMA param
                 | param
                 ;
-param::=asignacion
+param::=IDENTIFICADOR IGUAL expresion 
+        |IDENTIFICADOR 
         ;
 asignacion::= IDENTIFICADOR:a IGUAL expresion:b         {:RESULT = new Asignacion(a,b,aleft,aright);:}
             |idarreglo:a IGUAL expresion:b          {:RESULT = new Asignacion(a,b,aleft,aright);:}
@@ -241,7 +277,7 @@ idarreglo::= IDENTIFICADOR dimensiones
 dimensiones::= dimensiones dimension
             | dimension;
 dimension::= CORIZQ expresion CORDER
-            |CORIZQ CORIZQ expresion CORDER CORDER
+            |CORIZQ CORIZQ expresion CORDER CORDER  
             ;
 primitivo::=
     NUMERO:a                                        {:RESULT = new Primitivo(Integer.parseInt(a),Tipo.Tipos.INTEGER,aleft,aright);:}
@@ -252,5 +288,6 @@ primitivo::=
     |RFALSE:a                                         {:RESULT = new Primitivo(false,Tipo.Tipos.BOOLEANO,aleft,aright);:}
     |RNULL                                          {:RESULT = null;:}
     |idarreglo                                      
-    |llamada                                            
+    |llamada                                        
+    |RDEFAULT:a                                     {:RESULT = new Primitivo(a,Tipo.Tipos.DEFECTO,aleft,aright);:}                                      
     ;

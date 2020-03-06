@@ -26,7 +26,7 @@ import AST.NodoAST;
 %init}
 
     //----->ER
-    IDENTIFICADOR = [.]?([a-zA-Z][".""_"a-zA-Z0-9])
+    IDENTIFICADOR = [.]?([a-zA-Z]([".""_"a-zA-Z0-9])*)
     NUMERO = [0-9]+
     DECIMAL = [0-9]+[.][0-9]+
     COMENTUNILINEA =("#".*\r\n)|("#".*\n)|("#".*\r)
@@ -104,10 +104,10 @@ import AST.NodoAST;
         "," { return new Symbol(sym.COMA,yyline,yychar,yytext());}
         "=>" { return new Symbol(sym.IGUALFUNC,yyline,yychar,yytext());}
         \n {yychar=1;}
-        {IDENTIFICADOR}  { return new Symbol(sym.IDENTIFICADOR,yyline,yychar,yytext());}
-        {NUMERO}  { return new Symbol(sym.NUMERO,yyline,yychar,yytext());}
-        {DECIMAL}  { return new Symbol(sym.DECIMAL,yyline,yychar,yytext());}
-        {CADENA}  { return new Symbol(sym.CADENA,yyline,yychar,(yytext()).substring(1,yytext().length()-1));}
+        {IDENTIFICADOR}  {System.out.println(yytext()); return new Symbol(sym.IDENTIFICADOR,yyline,yychar,yytext()); }
+        {NUMERO}  {System.out.println(yytext()); return new Symbol(sym.NUMERO,yyline,yychar,yytext());}
+        {DECIMAL}  {System.out.println(yytext()+"decimal"); return new Symbol(sym.DECIMAL,yyline,yychar,yytext());}
+        {CADENA}  {System.out.println(yytext()); return new Symbol(sym.CADENA,yyline,yychar,(yytext()).substring(1,yytext().length()-1));}
         
         {BLANCOS}  { }
         {COMENTMULTILINEA}  { System.out.println("reconoció comentario multi");}
@@ -115,7 +115,7 @@ import AST.NodoAST;
         
     }
 
-.       { System.out.println("Error lexico "+yytext() + " Linea: "+(yyline+1)+ " Columna: "+yycolumn+1);
+.       { System.err.println("Error lexico "+yytext() + " Linea: "+(yyline+1)+ " Columna: "+yycolumn+1);
           Ventana.Error.add(new NodoError(yychar,yyline,"Lexico","Error, carácter : "+yytext()+" no reconocido"));
           }
 

@@ -34,6 +34,10 @@ public class ExpresionNumerica extends Expresion{
         this.fila = fila;
         this.columna = columna;
     }
+
+    public ExpresionNumerica(Expresion a, Operador operador, int aleft, int aright) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
     
     @Override

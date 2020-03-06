@@ -18,7 +18,9 @@ public class Tipo {
         VECTOR,
         LIST,
         MATRIX,
-        ARRAY
+        ARRAY,
+        DEFECTO,
+        VOID
     }
     public enum Operador{
         MAS,
