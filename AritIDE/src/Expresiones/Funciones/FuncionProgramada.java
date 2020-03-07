@@ -22,15 +22,16 @@ public class FuncionProgramada extends Funcion{
     
     private String id;
     private LinkedList<NodoAST> instrucciones;
+    private LinkedList<NodoAST> parametros;
     private Tipo.Tipos tipo;
     private int fila,columna;
     private TablaDeSimbolos local;
     
 
-    public FuncionProgramada(String id, LinkedList<NodoAST> instrucciones, Tipo.Tipos tipo, int columna, int fila) {
+    public FuncionProgramada(String id, LinkedList<NodoAST> instrucciones, LinkedList<NodoAST> parametros, int fila, int columna) {
         this.id = id;
         this.instrucciones = instrucciones;
-        this.tipo = tipo;
+        this.parametros = parametros;
         this.fila = fila;
         this.columna = columna;
     }

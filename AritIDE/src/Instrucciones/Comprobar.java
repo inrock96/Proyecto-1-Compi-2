@@ -14,20 +14,26 @@ import java.util.LinkedList;
  *
  * @author inti_
  */
-public class Para implements NodoAST{
+public class Comprobar implements NodoAST{
+    Expresion identificador;
+    LinkedList<NodoAST> casos;
+    NodoAST defecto;
+    int fila,columna;
 
-    String identificador;
-    Expresion cond;
-    LinkedList<NodoAST> instrucciones;
-    int fila, columna;
-
-    public Para(String identificador, Expresion cond, LinkedList<NodoAST> instrucciones, int fila, int columna) {
+    public Comprobar(Expresion identificador, LinkedList<NodoAST> casos, NodoAST defecto, int fila, int columna) {
         this.identificador = identificador;
-        this.cond = cond;
-        this.instrucciones = instrucciones;
+        this.casos = casos;
+        this.defecto = defecto;
         this.fila = fila;
         this.columna = columna;
     }
+    public Comprobar(Expresion identificador, LinkedList<NodoAST> casos, int fila, int columna) {
+        this.identificador = identificador;
+        this.casos = casos;
+        this.fila = fila;
+        this.columna = columna;
+    }
+    
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {

@@ -6,25 +6,16 @@
 package Instrucciones;
 
 import AST.NodoAST;
-import Expresiones.Expresion;
 import TablaDeSimbolos.TablaDeSimbolos;
-import java.util.LinkedList;
 
 /**
  *
  * @author inti_
  */
-public class Para implements NodoAST{
+public class Continue implements NodoAST{
+    int fila,columna;
 
-    String identificador;
-    Expresion cond;
-    LinkedList<NodoAST> instrucciones;
-    int fila, columna;
-
-    public Para(String identificador, Expresion cond, LinkedList<NodoAST> instrucciones, int fila, int columna) {
-        this.identificador = identificador;
-        this.cond = cond;
-        this.instrucciones = instrucciones;
+    public Continue(int fila, int columna) {
         this.fila = fila;
         this.columna = columna;
     }

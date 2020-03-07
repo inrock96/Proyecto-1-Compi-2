@@ -8,13 +8,35 @@ package Expresiones;
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
 import TablaDeSimbolos.Tipo;
+import java.util.LinkedList;
 
 /**
  *
  * @author inti_
  */
 public class Llamada implements NodoAST{
+    String identificador;
+    LinkedList<NodoAST> parametros;
+    int fila, columna;
     Tipo.Tipos tipo;
+
+    public Llamada(String identificador, LinkedList<NodoAST> parametros, int fila, int columna) {
+        this.identificador = identificador;
+        this.parametros = parametros;
+        this.fila = fila;
+        this.columna = columna;
+    }
+    
+    public Llamada(String identificador, int fila, int columna) {
+        this.identificador = identificador;
+        this.parametros = null;
+        this.fila = fila;
+        this.columna = columna;
+    }
+    
+    
+
+    
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {

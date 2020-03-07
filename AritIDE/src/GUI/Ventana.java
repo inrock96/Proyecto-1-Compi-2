@@ -426,11 +426,10 @@ public class Ventana extends javax.swing.JFrame {
         tabs.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                System.out.println(tabs.getSelectedComponent());
                 JPanel jp = ((JPanel) tabs.getSelectedComponent());
                 BorderLayout lout = (BorderLayout)jp.getLayout();
-                LineaText lt = (LineaText)(((JScrollPane)lout.getLayoutComponent(BorderLayout.CENTER)).getViewport().getView());
-            |   entrada = lt.text_pane;
+                entrada = ((JTextPane)((((JScrollPane)lout.getLayoutComponent(BorderLayout.CENTER)).getViewport().getView()))); 
+                
             }
         });
     }

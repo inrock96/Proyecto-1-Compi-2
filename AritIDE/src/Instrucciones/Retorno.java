@@ -8,30 +8,29 @@ package Instrucciones;
 import AST.NodoAST;
 import Expresiones.Expresion;
 import TablaDeSimbolos.TablaDeSimbolos;
-import java.util.LinkedList;
 
 /**
  *
  * @author inti_
  */
-public class Para implements NodoAST{
+public class Retorno implements NodoAST{
+    Expresion retorno;
+    int fila,columna;
 
-    String identificador;
-    Expresion cond;
-    LinkedList<NodoAST> instrucciones;
-    int fila, columna;
-
-    public Para(String identificador, Expresion cond, LinkedList<NodoAST> instrucciones, int fila, int columna) {
-        this.identificador = identificador;
-        this.cond = cond;
-        this.instrucciones = instrucciones;
+    public Retorno(Expresion retorno, int fila, int columna) {
+        this.retorno = retorno;
+        this.fila = fila;
+        this.columna = columna;
+    }
+    public Retorno( int fila, int columna) {
+        this.retorno = null;
         this.fila = fila;
         this.columna = columna;
     }
     
+
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }
