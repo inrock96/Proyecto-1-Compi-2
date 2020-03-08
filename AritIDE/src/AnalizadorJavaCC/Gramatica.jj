@@ -136,17 +136,6 @@ AST Analizar():
  *              | for
  *              | llamada
  *              | length 
- *              | ncol
- *              | nrow 
- *              | stringlength
- *              | remove 
- *              | tolower
- *              | toupper
- *              | trunk
- *              | round
- *              | mean
- *              | median
- *              | mode
  *              
  */
 NodoAST Instruccion() :

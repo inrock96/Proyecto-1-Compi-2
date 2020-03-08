@@ -3,31 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Instrucciones;
+package Expresiones;
 
 import AST.NodoAST;
-import Expresiones.Expresion;
 import TablaDeSimbolos.TablaDeSimbolos;
-import java.util.LinkedList;
 
 /**
  *
  * @author inti_
  */
-public class Caso implements NodoAST{
-    Expresion condicion;
-    LinkedList<NodoAST> instrucciones;
+public class Dimension implements NodoAST{
+    Expresion valor;
+    int tipo;
     int fila,columna;
 
-    public Caso(Expresion condicion, LinkedList<NodoAST> instrucciones, int fila, int columna) {
-        this.condicion = condicion;
-        this.instrucciones = instrucciones;
-        this.fila = fila;
-        this.columna = columna;
-    }
-    public Caso(LinkedList<NodoAST> instrucciones, int fila, int columna) {
-        this.condicion = null;
-        this.instrucciones = instrucciones;
+    public Dimension(Expresion valor, int tipo, int fila, int columna) {
+        this.valor = valor;
+        this.tipo = tipo;
         this.fila = fila;
         this.columna = columna;
     }

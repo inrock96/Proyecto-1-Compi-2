@@ -20,20 +20,45 @@ import java.util.LinkedList;
  */
 public class FuncionProgramada extends Funcion{
     
-    private String id;
+    final private String id;
     private LinkedList<NodoAST> instrucciones;
     private LinkedList<NodoAST> parametros;
     private Tipo.Tipos tipo;
-    private int fila,columna;
+    final private int fila,columna;
     private TablaDeSimbolos local;
     
-
-    public FuncionProgramada(String id, LinkedList<NodoAST> instrucciones, LinkedList<NodoAST> parametros, int fila, int columna) {
+    /**
+     * 
+     * @param id
+     * @param instrucciones
+     * @param parametros
+     * @param fila
+     * @param columna 
+     * Constructor para funciones con parametros
+     */
+    public FuncionProgramada(String id, LinkedList<NodoAST> parametros, LinkedList<NodoAST> instrucciones, int fila, int columna) {
         this.id = id;
         this.instrucciones = instrucciones;
         this.parametros = parametros;
         this.fila = fila;
         this.columna = columna;
+    }
+    
+    
+    /**
+     * 
+     * @param id
+     * @param instrucciones
+     * @param aleft
+     * @param aright 
+     * Constructor para funciones sin parámetros
+     */
+    public FuncionProgramada(String id, LinkedList<NodoAST> instrucciones, int fila, int columna) {
+        this.id = id;
+        this.instrucciones = instrucciones;
+        this.fila = fila;
+        this.columna = columna;
+        parametros = null;
     }
     
     
@@ -79,9 +104,7 @@ public class FuncionProgramada extends Funcion{
     /**
      * @param id the id to set
      */
-    public void setId(String id) {
-        this.id = id;
-    }
+    
 
     /**
      * @return the instrucciones
@@ -121,10 +144,7 @@ public class FuncionProgramada extends Funcion{
     /**
      * @param fila the fila to set
      */
-    public void setFila(int fila) {
-        this.fila = fila;
-    }
-
+    
     /**
      * @return the columna
      */
@@ -132,13 +152,7 @@ public class FuncionProgramada extends Funcion{
         return columna;
     }
 
-    /**
-     * @param columna the columna to set
-     */
-    public void setColumna(int columna) {
-        this.columna = columna;
-    }
-
+    
     /**
      * @return the local
      */

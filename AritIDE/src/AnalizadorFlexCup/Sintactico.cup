@@ -3,30 +3,35 @@
 
 package AnalizadorFlexCup;
 
+
 import AST.NodoAST;
 import Expresiones.Identificador;
 import Expresiones.Expresion;
+import Expresiones.Funciones.FuncionProgramada;
 import Expresiones.Primitivo;
 import Expresiones.Ternario;
 import TablaDeSimbolos.Tipo;
 import Expresiones.ExpresionLogica;
 import Expresiones.ExpresionNumerica;
 import Expresiones.ExpresionRelacional;
-import Expresiones.Funciones.Funcion;
+import Expresiones.IdArreglo;
 import Instrucciones.Asignacion;
 import java_cup.runtime.*;
 import java.util.*;
 import GUI.Ventana;
 import Instrucciones.If;
 import Expresiones.Llamada;
+import Instrucciones.Break;
 import Instrucciones.Caso;
 import Instrucciones.Comprobar;
+import Instrucciones.Continue;
 import Instrucciones.HacerMientras;
 import Instrucciones.Mientras;
 import Instrucciones.Para;
+import Instrucciones.Retorno;
 import TablaDeSimbolos.NodoError;
-import java.awt.Dimension;
-
+import Expresiones.Dimension;
+import Expresiones.LlamadaArreglo;
 
 parser code{:
     /**
@@ -118,13 +123,14 @@ non terminal ini;
 non terminal LinkedList<NodoAST> instrucciones;
 non terminal LinkedList<NodoAST> listaexpresiones, instruccioneslocales, elseifs;
 non terminal LinkedList<NodoAST> bloque, casos,listaparam, dimensiones; 
-non terminal NodoAST llamada, instruccionlocal, elseif;
+non terminal NodoAST  instruccionlocal, elseif;
 non terminal NodoAST instruccion;
-non terminal NodoAST ntif, idarreglo,dimension;
+non terminal NodoAST ntif,dimension;
 non terminal NodoAST caso, defecto,param,asignacion;
 non terminal Expresion expresion_numerica,primitivo;
 non terminal Expresion expresion,expresion_relacional;
 non terminal Expresion expresion_logica;
+non terminal Expresion idarreglo,llamada,llamadaarreglo;
 non terminal FuncionProgramada parametros;
 
 precedence left OR;
@@ -146,9 +152,7 @@ precedence right NOT;
 precedence right IGUAL;
 start with ini;
 
-ini::= instrucciones:a{:
-    parser.AST =a;
-:}
+ini::= instrucciones:a{: parser.AST =a;:}
 ;
 
 instrucciones ::= instrucciones:a instruccion:b{:RESULT = a; RESULT.add(b);:}
@@ -165,13 +169,14 @@ instruccion ::=
         | RFOR PARIZQ IDENTIFICADOR:a RIN expresion:b PARDER bloque:c           {:RESULT = new Para(a,b,c,aleft,aright);:}
         | IDENTIFICADOR:a IGUAL RFUNC PARIZQ listaparam:b PARDER bloque:c       {: RESULT = new FuncionProgramada(a,b,c,aleft,aright);:}     //metodo
         | IDENTIFICADOR:a IGUAL RFUNC PARIZQ  PARDER bloque:b                   {:RESULT = new FuncionProgramada(a,b,aleft,aright);:}     //metodo
-        | parametros:a PARDER IGUALFUNC bloque:b                                {:a.setBloque(b);RESULT = a;:}
-        | IDENTIFICADOR:a IGUAL IDENTIFICADOR:b PARIZQ PARDER IGUALFUNC bloque:c {:RESULT = FuncionProgramada(a,new LinkedList<NodoAST>(b),c,aleft,aright);:}
+        | parametros:a PARDER IGUALFUNC bloque:b                                {:a.setInstrucciones(b);RESULT = a;:}
+        | IDENTIFICADOR:a IGUAL IDENTIFICADOR:b PARIZQ PARDER IGUALFUNC bloque:c {:LinkedList parametros = new LinkedList<NodoAST>();Asignacion asig =new Asignacion(a,null,aleft,aright); parametros.add(asig); RESULT = new FuncionProgramada(a,parametros,c,aleft,aright);:}
         | IDENTIFICADOR:a IGUAL PARIZQ PARDER IGUALFUNC bloque:b                {: RESULT = new FuncionProgramada(a,b,aleft,aright);:}
-        | RDO:c bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA                  {: RESULT = new HacerMientras(b,a,cleft,cright);:}
+        | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA                  {: RESULT = new HacerMientras(b,a,aleft,aright);:}
         | asignacion:a PTCOMA                                                   {:RESULT =a;:}
         | llamada:a PTCOMA                                                      {:RESULT =a;:}
         | llamada:a                                                             {:RESULT =a;:}
+        
         | RDO:c bloque:a RWHILE PARIZQ expresion:b PARDER                         {: RESULT = new HacerMientras(b,a,cleft,cright);:}
         | asignacion:a                                                          {:RESULT =a;:}
         | error PTCOMA
@@ -180,9 +185,11 @@ instruccion ::=
 llamada::= IDENTIFICADOR:a PARIZQ listaexpresiones:b PARDER                                 {:RESULT = new Llamada(a,b,aleft,aright);:}      //llamada
             |IDENTIFICADOR:a PARIZQ  PARDER                                                   {:RESULT = new Llamada(a,aleft,aright);:}
             ;
-parametros::=IDENTIFICADOR:a IGUAL PARIZQ IDENTIFICADOR:b COMA listaparam:c                       {: Asignacion asig = new Asignacion(b,null,bleft,bright);c.addFirst(b); RESULT = new FuncionProgramada(a,c,aleft,aright);:}
-            | IDENTIFICADOR:a IGUAL PARIZQ IDENTIFICADOR:b IGUAL expresion:c COMA listaparam:d  {: Asignacion asig = new Asignacion(b,c,bleft,bright);d.addFirst(c); RESULT = new Funcion(a,d,aleft,aright);:}         
-            |IDENTIFICADOR:a IGUAL PARIZQ IDENTIFICADOR:b IGUAL expresion:c                       {: Asignacion asig = new Asignacion(b,c,bleft,bright); RESULT = new FuncionProgramada(a,asig,aleft,aright);:}
+llamadaarreglo::= llamada:a dimensiones:b                                               {:RESULT = new LlamadaArreglo(a,b);:}
+            ;
+parametros::=IDENTIFICADOR:a IGUAL PARIZQ IDENTIFICADOR:b COMA listaparam:c                       {: Asignacion asig = new Asignacion(b,null,bleft,bright);c.addFirst(asig); RESULT = new FuncionProgramada(a,c,aleft,aright);:}
+            | IDENTIFICADOR:a IGUAL PARIZQ IDENTIFICADOR:b IGUAL expresion:c COMA listaparam:d  {: Asignacion asig = new Asignacion(b,c,bleft,bright);d.addFirst(c); RESULT = new FuncionProgramada(a,d,aleft,aright);:}         
+            |IDENTIFICADOR:a IGUAL PARIZQ IDENTIFICADOR:b IGUAL expresion:c                       {:LinkedList parametros = new LinkedList<>(); Asignacion asig = new Asignacion(b,c,bleft,bright); parametros.add(asig); RESULT = new FuncionProgramada(a,parametros,aleft,aright);:}
             ;
 instruccioneslocales::= instruccioneslocales:a instruccionlocal:b                           {:RESULT = a;RESULT.add(b);:}
                         |instruccionlocal:a                                                 {:RESULT = new LinkedList<NodoAST>();RESULT.add(a);:}
@@ -197,17 +204,17 @@ instruccionlocal::=  RBREAK:a PTCOMA                                            
                     | RSWITCH PARIZQ expresion:a PARDER LLAVIZQ casos:b defecto:c LLAVDER   {: RESULT = new Comprobar(a,b,c,aleft,aright);:}   
                     | RSWITCH PARIZQ expresion:a PARDER LLAVIZQ casos:b LLAVDER             {: RESULT = new Comprobar(a,b,aleft,aright);:}
                     | RFOR PARIZQ IDENTIFICADOR:a RIN expresion:b PARDER bloque:c           {: RESULT = new Para(a,b,c,aleft,aright);:}
-                    | RDO:c bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA                  {: RESULT = new HacerMientras(b,a,cleft,cright);}              
-                    | asignacion PTCOMA                                                     {: RESULT = a;:}
-                    | IDENTIFICADOR PARIZQ listaexpresiones PARDER PTCOMA                   {: RESULT = new Llamada(a,b,aleft,aright);:}//llamada
-                    | IDENTIFICADOR PARIZQ  PARDER PTCOMA                                   {: RESULT = new Llamada(a,aleft,aright);:}    //llamada
+                    | RDO bloque:a RWHILE PARIZQ expresion:b PARDER PTCOMA                  {: RESULT = new HacerMientras(b,a,bleft,bright);:}              
+                    | asignacion:a PTCOMA                                                     {: RESULT = a;:}
+                    | IDENTIFICADOR:a PARIZQ listaexpresiones:b PARDER PTCOMA                   {: RESULT = new Llamada(a,b,aleft,aright);:}//llamada
+                    | IDENTIFICADOR:a PARIZQ  PARDER PTCOMA                                   {: RESULT = new Llamada(a,aleft,aright);:}    //llamada
                     | RDO:c bloque:a RWHILE PARIZQ expresion:b PARDER                       {: RESULT = new HacerMientras(b,a,cleft,cright);:}
                     | asignacion:a                                                          {: RESULT = a;:}
                     | IDENTIFICADOR:a PARIZQ listaexpresiones:b PARDER                      {: RESULT = new Llamada(a,b,aleft,aright); :}//llamada           
                     | IDENTIFICADOR:a PARIZQ  PARDER                                        {: RESULT = new Llamada(a,aleft,aright);:}//llamada                                                    
                     | RBREAK:a                                                              {: RESULT = new Break(aleft,aright);:}
                     | RRETURN:a PARIZQ expresion:e PARDER                                   {: RESULT = new Retorno(e,aleft,aright);:}
-                    | RRETURN:a                                                             {: RESULT = new Retorno(aleft,aright);):}
+                    | RRETURN:a                                                             {: RESULT = new Retorno(aleft,aright);:}
                     | RCONTINUE:a                                                           {: RESULT = new Continue(aleft,aright);:}
                     ;
 
@@ -223,19 +230,19 @@ listaparam::=   listaparam:a COMA param:b               {: RESULT = a; RESULT.ad
                 | param:a                               {: RESULT = new LinkedList<NodoAST>(); RESULT.add(a);:}
                 ;
 param::=IDENTIFICADOR:a IGUAL expresion:b               {:RESULT = new Asignacion(a,b,aleft,aright);:}
-        |IDENTIFICADOR:a                              {: RESULT = new Asignacion(a,null,aleft,aright);):} 
+        |IDENTIFICADOR:a                              {: RESULT = new Asignacion(a,null,aleft,aright);:} 
         ;
 asignacion::= IDENTIFICADOR:a IGUAL expresion:b         {:RESULT = new Asignacion(a,b,aleft,aright);:}
             |idarreglo:a IGUAL expresion:b          {:RESULT = new Asignacion(a,b,aleft,aright);:}
             ;
 casos   ::= casos:a caso:b                                      {:RESULT = a; RESULT.add(b);:}
-            caso:a                                          {:RESULT = new LinkedList<NodoAST>();RESULT.add(a);:}
+            |caso:a                                          {:RESULT = new LinkedList<NodoAST>();RESULT.add(a);:}
             ;
 caso    ::= RCASE expresion:a DOSPT instruccioneslocales:b  {:RESULT = new Caso(a,b,aleft,aright);:}       
             ;
 defecto ::= RDEFAULT:b DOSPT instruccioneslocales:a         {:RESULT = new Caso(a,bleft,bright);:}
             ;
-elseifs ::=  elseifs:a elseif:b                             {::RESULT = a; RESULT.add(b);}
+elseifs ::=  elseifs:a elseif:b                             {:RESULT = a; RESULT.add(b);:}
             |elseif:a                                         {:RESULT = new LinkedList<NodoAST>(); RESULT.add(a);:}
             ;
 elseif ::= RELSE RIF PARIZQ expresion:a PARDER bloque:b     {:RESULT = new If(a,b,aleft,aright);:}
@@ -280,7 +287,7 @@ idarreglo::= IDENTIFICADOR:a dimensiones:b          {:RESULT = new IdArreglo(a,b
 dimensiones::= dimensiones:a dimension:b            {: RESULT = a; RESULT.add(b);:}
             | dimension:a                           {: RESULT = new LinkedList<NodoAST>(); RESULT.add(a);:}
             ;
-dimension::= CORIZQ expresion CORDER                {: RESULT = new Dimension(a,2,aleft,aright);:}
+dimension::= CORIZQ expresion:a CORDER                {: RESULT = new Dimension(a,1,aleft,aright);:}
             |CORIZQ CORIZQ expresion:a CORDER CORDER  {: RESULT = new Dimension(a,2,aleft,aright);:}  
             ;
 primitivo::=
@@ -293,5 +300,6 @@ primitivo::=
     |RNULL:a                                        {: RESULT = new Primitivo("null",Tipo.Tipos.STRING,aleft,aright);:}
     |idarreglo:a                                    {: RESULT = a;:}
     |llamada:a                                      {: RESULT = a;:}                                        
-    |RDEFAULT:a                                     {: RESULT = new Primitivo(a,Tipo.Tipos.DEFECTO,aleft,aright);:}                                      
+    |RDEFAULT:a                                     {: RESULT = new Primitivo(a,Tipo.Tipos.DEFECTO,aleft,aright);:}     
+    |llamadaarreglo:a                               {: RESULT = a;:}                                 
     ;

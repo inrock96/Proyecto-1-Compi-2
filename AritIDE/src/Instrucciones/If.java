@@ -18,6 +18,7 @@ public class If implements NodoAST{
     Expresion condicion;
     LinkedList<NodoAST>elseifs;
     LinkedList<NodoAST>instrucciones;
+    LinkedList<NodoAST>instrElse;
     int fila,columna;
     
     
@@ -30,12 +31,21 @@ public class If implements NodoAST{
         this.columna = columna;
     }
     
-    public If(Expresion condicion, LinkedList<NodoAST> elseifs, LinkedList<NodoAST> instrucciones, int fila, int columna) {
+    public If(Expresion condicion, LinkedList<NodoAST> instrucciones, LinkedList<NodoAST> elseifs, int fila, int columna) {
         this.condicion = condicion;
         this.elseifs = elseifs;
         this.instrucciones = instrucciones;
         this.fila = fila;
         this.columna = columna;
+    }
+    
+    public If(Expresion condicion, LinkedList<NodoAST> instrucciones, LinkedList<NodoAST> elseifs,LinkedList<NodoAST> instrElse, int fila, int columna) {
+        this.condicion = condicion;
+        this.elseifs = elseifs;
+        this.instrucciones = instrucciones;
+        this.fila = fila;
+        this.columna = columna;
+        this.instrElse = instrElse;
     }
     
     @Override

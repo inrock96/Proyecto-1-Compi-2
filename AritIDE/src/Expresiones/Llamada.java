@@ -14,7 +14,7 @@ import java.util.LinkedList;
  *
  * @author inti_
  */
-public class Llamada implements NodoAST{
+public class Llamada extends Expresion{
     String identificador;
     LinkedList<NodoAST> parametros;
     int fila, columna;

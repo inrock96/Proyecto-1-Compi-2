@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Instrucciones;
+package Expresiones;
 
 import AST.NodoAST;
-import Expresiones.Expresion;
 import TablaDeSimbolos.TablaDeSimbolos;
 import java.util.LinkedList;
 
@@ -14,20 +13,14 @@ import java.util.LinkedList;
  *
  * @author inti_
  */
-public class Caso implements NodoAST{
-    Expresion condicion;
-    LinkedList<NodoAST> instrucciones;
+public class IdArreglo extends Expresion{
+    String id;
+    LinkedList<NodoAST> dimensiones;
     int fila,columna;
 
-    public Caso(Expresion condicion, LinkedList<NodoAST> instrucciones, int fila, int columna) {
-        this.condicion = condicion;
-        this.instrucciones = instrucciones;
-        this.fila = fila;
-        this.columna = columna;
-    }
-    public Caso(LinkedList<NodoAST> instrucciones, int fila, int columna) {
-        this.condicion = null;
-        this.instrucciones = instrucciones;
+    public IdArreglo(String id, LinkedList<NodoAST> dimensiones, int fila, int columna) {
+        this.id = id;
+        this.dimensiones = dimensiones;
         this.fila = fila;
         this.columna = columna;
     }
