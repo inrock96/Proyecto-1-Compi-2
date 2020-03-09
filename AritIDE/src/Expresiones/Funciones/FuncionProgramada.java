@@ -18,13 +18,14 @@ import java.util.LinkedList;
  *
  * @author inti_
  */
-public class FuncionProgramada extends Funcion{
+public class FuncionProgramada implements NodoAST{
     
     final private String id;
     private LinkedList<NodoAST> instrucciones;
     private LinkedList<NodoAST> parametros;
     private Tipo.Tipos tipo;
-    final private int fila,columna;
+    private final int fila;
+    private final int columna;
     private TablaDeSimbolos local;
     
     /**
@@ -165,6 +166,20 @@ public class FuncionProgramada extends Funcion{
      */
     public void setLocal(TablaDeSimbolos local) {
         this.local = local;
+    }
+
+    /**
+     * @return the parametros
+     */
+    public LinkedList<NodoAST> getParametros() {
+        return parametros;
+    }
+
+    /**
+     * @param parametros the parametros to set
+     */
+    public void setParametros(LinkedList<NodoAST> parametros) {
+        this.parametros = parametros;
     }
     
 }

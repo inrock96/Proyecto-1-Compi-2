@@ -20,7 +20,8 @@ public class Tipo {
         MATRIX,
         ARRAY,
         DEFECTO,
-        VOID
+        VOID,
+        NONE
     }
     public enum Operador{
         MAS,

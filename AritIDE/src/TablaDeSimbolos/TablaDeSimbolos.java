@@ -32,6 +32,7 @@ public class TablaDeSimbolos {
             if(encontrado!=null){
                 e.tabla.put(id, simbolo);                
                 return true;
+                
             }
         }
         return false;

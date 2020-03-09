@@ -6,6 +6,7 @@
 package AST;
 
 import TablaDeSimbolos.TablaDeSimbolos;
+import TablaDeSimbolos.Tipo;
 
 /**
  *
@@ -18,4 +19,5 @@ public interface NodoAST {
      * @return 
      */
     Object ejecutar(TablaDeSimbolos ts);
+    Tipo.Tipos getTipo();
 }

@@ -8,7 +8,37 @@ PARSER_BEGIN(Gramatica)
 /** Analizador de lenguaje Arit **/
 
 //imports
+package AnalizadorJavaCC;
 
+import AST.AST; 
+import AST.NodoAST;
+import Expresiones.Identificador;
+import Expresiones.Expresion;
+import Expresiones.Funciones.FuncionProgramada;
+import Expresiones.Primitivo;
+import Expresiones.Ternario;
+import TablaDeSimbolos.Tipo;
+import Expresiones.ExpresionLogica;
+import Expresiones.ExpresionNumerica;
+import Expresiones.ExpresionRelacional;
+import Expresiones.IdArreglo;
+import Instrucciones.Asignacion;
+import java_cup.runtime.*;
+import java.util.*;
+import GUI.Ventana;
+import Instrucciones.If;
+import Expresiones.Llamada;
+import Instrucciones.Break;
+import Instrucciones.Caso;
+import Instrucciones.Comprobar;
+import Instrucciones.Continue;
+import Instrucciones.HacerMientras;
+import Instrucciones.Mientras;
+import Instrucciones.Para;
+import Instrucciones.Retorno;
+import TablaDeSimbolos.NodoError;
+import Expresiones.Dimension;
+import Expresiones.LlamadaArreglo;
 public class Gramatica{
 
 }
@@ -30,11 +60,10 @@ TOKEN : {
 
   <NUMERO: (["0"-"9"])+>
   | <DECIMAL: (["0"-"9"])+"."(["0"-"9"])+>
-  | <CADENA: "\""((~["\"","\n"]|~(\\,"\"")))"\"">
+  
   | <RNULL: "null">
   | <RIF: "if">
   | <RELSE: "else">
-  | <RPRINT: "print">
   | <RSWITCH: "switch">
   | <RCASE: "case">
   | <RWHILE: "while">
@@ -45,28 +74,6 @@ TOKEN : {
   | <RCONTINUE: "continue">
   | <RRETURN: "return">
   | <RFUNC: "function">
-  | <RC: "c">
-  | <RTYPEOF: "typeof">
-  | <RLENGTH: "length">
-  | <RNCOL: "ncol">
-  | <RNROW: "nrow">
-  | <RSTRINGLENGTH: "stringlength">
-  | <RREMOVE: "remove">
-  | <RTOLOWER: "tolowercase">
-  | <RTOUPPER: "touppercase">
-  | <RTRUNK: "trunk">
-  | <RROUND: "round">
-  | <RMEAN: "mean">
-  | <RMEDIAN: "median">
-  | <RMODE: "mode">
-  | <RLIST: "list">
-  | <RMATRIX: "matrix">
-  | <RARRAY: "array">
-  | <RPIE: "pie">
-  | <RBARPLOT: "barplot">
-  | <RPLOT: "plot">
-  | <RHIST: "hist">
-
   | <PTCOMA: ";">
   | <COMA: ",">
   | <DOSPT: ":">
@@ -94,11 +101,12 @@ TOKEN : {
   | <OR: "|">
   | <NOT: "!" >
   | <IGUALFUNC: "=>">
-  | <IDENTIFICADOR: ["."]? ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_","."] | ["0"-"9"] )* >
+  | <IDENTIFICADOR: (["."])? ["a"-"z","A"-"Z", "_"] ( ["a"-"z","A"-"Z", "_","."] | ["0"-"9"] )* >
 }
 
 
-MORE :
+
+MORE:
 {
     "\"" :STRING_STATE
 }
@@ -120,7 +128,7 @@ MORE :
  * Analizar -> (Instruccion)+ EOF
  */
 AST Analizar():
-{LinkedList<NodoAST> ins = new LinkedList<>(); NodoAST nodo;}
+{LinkedList ins = new LinkedList<NodoAST>(); NodoAST nodo;}
 {
   (nodo = Instruccion() {ins.add(nodo);})+ <EOF> {return new AST(ins);}
 }
@@ -141,41 +149,31 @@ AST Analizar():
 NodoAST Instruccion() :
 {NodoAST nodo;}
 {
-  nodo = Print() {return nodo;}
-  |
   nodo = Asignacion() {return nodo;}
   |
   nodo = If() {return nodo;}
 }
 
-/**
- * RPRINT -> print ( Expresion );
- */
-NodoAST Print() : 
-{NodoAST nodo;}
-{
-  <RPRINT> <PARIZQ> nodo = Expresion() <PARDER> <PTCOMA> 
-}
 
 /**
  * Asignación-> IDENTIFICADOR = expresion;
  *            | IDENTIFICADOR Dimension = expresion;
  */
 NodoAST Asignacion() :
-{NodoAST nodo;Token id;}
+{Expresion e;Token id;}
 {
-  id=<IDENTIFICADOR><IGUAL> nodo = Expresion() <PTCOMA> {return new Asignacion();}
+  id=<IDENTIFICADOR><IGUAL> e = Expresion() <PTCOMA> {return new Asignacion(id.image,e,token.beginLine,token.beginColumn);}
 }
 
 /**
  * If -> if(condicion) { Bloque } (else if {Bloque})* (else {bloque})?
  */
 NodoAST If() :
-{NodoAST nodo, if; LinkedList<NodoAST> insIf, insElse = LinkedList<NodoAST>(); }
+{Expresion nodo, si; LinkedList<NodoAST> insIf, insElse = new LinkedList<NodoAST>(); }
 {
   <RIF> <PARIZQ> nodo = Expresion() <PARDER> insIf = Bloque()
   (
-    LOOKAHEAD(2) <RELSE> if = If() {insElse.add(if);}
+    LOOKAHEAD(2) <RELSE> si = If() {insElse.add(si);}
     |
     LOOKAHEAD(2) <RELSE> insElse = Bloque()
   )?
@@ -186,39 +184,147 @@ NodoAST If() :
  * Bloque -> {instrucciones+}
  */
 LinkedList<NodoAST> Bloque() : 
-{LinkedList<NodoAST> insBloque = new LinkedList<>(NodoAST); NodoAST nodo;}
+{LinkedList insBloque = new LinkedList<NodoAST>(); NodoAST nodo;}
 {
-  <LLAVEIZQ> (nodo=Instruccion() {insBloque.add(nodo);})* <LLAVEDER>{return insBloque;}
+  <LLAVEIZQ> (nodo=InstruccionLocal() {insBloque.add(nodo);})* <LLAVEDER>{return insBloque;}
+}
+
+NodoAST InstruccionLocal():
+{NodoAST nodo;}
+{
+  
+  nodo = Asignacion() {return nodo;}
+  |
+  nodo = If() {return nodo;}
 }
 
 /**
  * Expresion
  */
-NodoAST Expresion():
-{NodoAST e,e1;}
+Expresion Expresion():
+{Expresion e,e1;}
 {
   e = CondicionAnd()
   (
-    <AND> e1=CondicionAnd() {e = new Logica(e,e1,OperadorLogico.AND,token.beginLine,token.beginColumn);}
-    |
-    <OR> e1 = CondicionAnd() {e = new Logica(e,e1,OperadorLogico.OR,token.beginLine,token.beginColumn);}
+    <OR> e1 = CondicionAnd() {e = new ExpresionLogico(e,e1,Tipo.Tipos.OR,token.beginLine,token.beginColumn);}
   )*
   {return e;}
 }
 
-NodoAST CondicionAnd():
-{NodoAST e,e1;}
+ExpresionLogica CondicionAnd():
+{Expresion e,e1;}
 {
-  
+  e= ExpresionIgualdad()
+  (
+    <AND> e1 = ExpresionIgualdad() {e= new ExpresionLogica(e,e1,Tipo.Tipos.AND,token.beginLine,token.beginColumn);}
+  )*
+  {return e;}  
 }
 
-NodoAST Primitivo():
-{NodoAST e; Token t;}
+/** ExpresionIgualdad -> ExpresionRelacional ('==' ExpresionRelacional)*
+                     |  ExpresionRelacional ('!=' ExpresionRelacional)*
+*/
+ExpresionRelacional ExpresionIgualdad() :
+{Expresion e, e1;}
 {
-  <NUMERO>{return new Primitivo();}
-  |
-  <DECIMAL>{return new Primitivo();}
-  |
-  t = <STRING> {return new Primitivo();}
-  |<PARIZQ> e = Expresion() <PARDER> {return e;}
+    e=ExpresionRelacional() 
+    (
+        <IGUALACION> e1=ExpresionRelacional() {e = new ExpresionRelacional(e, e1, OperadorRelacional.IGUALACION, token.beginLine, token.beginColumn);}
+        |
+        <DIFERENCIACION> e1=ExpresionRelacional() {e = new ExpresionRelacional(e, e1, OperadorRelacional.DIFERENCIACION, token.beginLine, token.beginColumn);}
+    )*
+    {return e;}
+}
+
+
+/** ExpresionRelacional -> ExpresionAditiva ('>' ExpresionAditiva)*
+                     |  ExpresionAditiva ('<' ExpresionAditiva)*
+                     |  ExpresionAditiva ('>=' ExpresionAditiva)*
+                     |  ExpresionAditiva ('<=' ExpresionAditiva)*
+*/
+ExpresionRelacional ExpresionRelacional() :
+{Expresion e, e1;}
+{
+    e=ExpresionAditiva() 
+    (
+        <MAYQUE> e1=ExpresionAditiva() {e = new ExpresionRelacional(e, e1, Tipo.Tipos.MAYQUE, token.beginLine, token.beginColumn);}
+        |
+        <MENQUE> e1=ExpresionAditiva() {e = new ExpresionRelacional(e, e1, Tipo.Tipos.MENQUE, token.beginLine, token.beginColumn);}
+        |
+        <MAYIGUAL> e1=ExpresionAditiva() {e = new ExpresionRelacional(e, e1, Tipo.Tipos.MAYIGUAL, token.beginLine, token.beginColumn);}
+        |
+        <MENIGUAL> e1=ExpresionAditiva() {e = new ExpresionRelacional(e, e1, Tipo.Tipos.MENIGUAL, token.beginLine, token.beginColumn);}
+    )*
+    {return e;}
+}
+
+
+/** ExpresionAditiva -> ExpresionMultiplicativa ('+' ExpresionMultiplicativa)*
+                     |  ExpresionMultiplicativa ('-' ExpresionMultiplicativa)*
+*/
+ExpresionAritmetica ExpresionAditiva() :
+{Expresion e, e1;}
+{
+    e=ExpresionMultiplicativa()
+    (
+        <MAS> e1=ExpresionMultiplicativa() {e = new ExpresionAritmetica(e, e1, Tipo.Operador.MAS, token.beginLine, token.beginColumn);}
+        |
+        <MENOS> e1=ExpresionMultiplicativa() {e = new ExpresionAritmetica(e, e1, Tipo.Operador.MENOS, token.beginLine, token.beginColumn);}
+    )*
+    {return e;}
+}
+
+/** ExpresionMultiplicativa -> ExpresionUnaria ('*' ExpresionUnaria)*
+                            |  ExpresionUnaria ('/' ExpresionUnaria)*
+                            |  ExpresionUnaria ('%' Expresionunaria)*
+*/
+AST ExpresionMultiplicativa() :
+{AST e, e1;}
+{
+    e=ExpresionUnaria()
+    (
+        <POR> e1=ExpresionUnaria() {e = new ExpresionAritmetica(e, e1, Tipo.Operador.POR, token.beginLine, token.beginColumn);}
+        |
+        <DIV> e1=ExpresionUnaria() {e = new ExpresionAritmetica(e, e1, Tipo.Operador.DIV, token.beginLine, token.beginColumn);}
+        |
+        <MOD> e1=ExpresionUnaria() {e =new ExpresionAritmetica(e, e1, Tipo.Operador.DIV, token.beginLine, token.beginColumn);}
+    )*
+    {return e;}
+}
+
+/** ExpresionUnaria -> '-' ExpresionUnaria
+                    |  Primitivo
+ */
+Expresion ExpresionUnaria() :
+{Expresion e;}
+{
+    <MENOS> e=ExpresionUnaria() {return new Aritmetica(e, OperadorAritmetico.MENOSUNARIO, token.beginLine, token.beginColumn);}
+    |
+    <NOT> e=ExpresionUnaria() {return new Logica(e, OperadorLogico.NOT, token.beginLine, token.beginColumn);}
+    |
+    e=Primitivo() {return e;}
+}
+
+/** Primitivo -> Numero
+              |  Decimal
+              |  '(' Expresion ')' 
+*/
+Expresion Primitivo() :
+{Expresion e; Token t; String cad;}
+{
+    <NUMERO> {return new Primitivo(new Tipo(Tipos.NUMERO), Double.parseDouble(token.image), token.beginLine, token.beginColumn);}
+    |
+    <DECIMAL> {return new Primitivo(new Tipo(Tipos.NUMERO), Double.parseDouble(token.image), token.beginLine, token.beginColumn);}
+    
+    |
+    t=<STRING> {    cad = t.image.substring(1,t.image.length()-1);
+                    cad = cad.replace("\\","\\");
+                    cad = cad.replace("\\n","\n");
+                    cad = cad.replace("\\t","\t");
+                    return new Primitivo(new Tipo(Tipos.CADENA), cad, token.beginLine, token.beginColumn);}
+    |
+    LOOKAHEAD(2)t=<IDENTIFICADOR> {return new Identificador(t.image, token.beginLine, token.beginColumn);}
+    |
+    <PARIZQ> e=Expresion() <PARDER> {return e;}
+    
 }

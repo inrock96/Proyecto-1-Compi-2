@@ -5,7 +5,9 @@
  */
 package TablaDeSimbolos;
 
+import AST.NodoAST;
 import Expresiones.Funciones.*;
+import Instrucciones.Asignacion;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
@@ -30,8 +32,12 @@ public class Singleton {
         return singleton;
     }
     private static void crearNativas(){
-        Print imprimir = new Print("print");
+        LinkedList parametros = new LinkedList<NodoAST>();
+        parametros.add(new Asignacion("print%%parametro1", null, -1, -1));
+        Print imprimir = new Print("print", parametros, null, -1, -1);
         funciones.put("print", imprimir);
+        
+        
     }
     public static void addFuncion(FuncionProgramada f){
         funciones.put(f.getId(),f);
