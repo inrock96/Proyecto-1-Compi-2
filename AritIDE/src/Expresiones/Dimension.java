@@ -7,6 +7,7 @@ package Expresiones;
 
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
+import TablaDeSimbolos.Tipo;
 
 /**
  *
@@ -26,6 +27,11 @@ public class Dimension implements NodoAST{
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Tipo.Tipos getTipo() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

@@ -234,6 +234,7 @@ param::=IDENTIFICADOR:a IGUAL expresion:b               {:RESULT = new Asignacio
         ;
 asignacion::= IDENTIFICADOR:a IGUAL expresion:b         {:RESULT = new Asignacion(a,b,aleft,aright);:}
             |idarreglo:a IGUAL expresion:b          {:RESULT = new Asignacion(a,b,aleft,aright);:}
+
             ;
 casos   ::= casos:a caso:b                                      {:RESULT = a; RESULT.add(b);:}
             |caso:a                                          {:RESULT = new LinkedList<NodoAST>();RESULT.add(a);:}
@@ -282,7 +283,11 @@ expresion_logica::=
     |NOT expresion:a                                    {:RESULT = new ExpresionLogica(a,Tipo.Operador.NOT,aleft,aright);:}
     |expresion:a TERNARIO expresion:b DOSPT expresion:c {:RESULT = new Ternario(a,b,c,aleft,aright);:}
     ;
-idarreglo::= IDENTIFICADOR:a dimensiones:b          {:RESULT = new IdArreglo(a,b,aleft,aright);:}              
+idarreglo::= IDENTIFICADOR:a dimensiones:b          {:RESULT = new IdArreglo(a,b,aleft,aright);:} 
+            |IDENTIFICADOR:a CORIZQ expresion:b COMA expresion:c CORDER{:RESULT = new IdArreglo(a,b,c,aleft,aright);:}
+            |IDENTIFICADOR:a CORIZQ expresion:b COMA  CORDER{:RESULT = new IdArreglo(a,b,null,aleft,aright);:}
+            |IDENTIFICADOR:a CORIZQ  COMA expresion:b CORDER{:RESULT = new IdArreglo(a,null,b,aleft,aright);:}
+
             ;
 dimensiones::= dimensiones:a dimension:b            {: RESULT = a; RESULT.add(b);:}
             | dimension:a                           {: RESULT = new LinkedList<NodoAST>(); RESULT.add(a);:}

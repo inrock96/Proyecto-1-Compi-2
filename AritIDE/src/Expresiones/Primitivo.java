@@ -8,6 +8,7 @@ package Expresiones;
 import AST.NodoAST;
 import TablaDeSimbolos.TablaDeSimbolos;
 import TablaDeSimbolos.Tipo;
+import java.util.Vector;
 
 /**
  *
@@ -27,6 +28,8 @@ public class Primitivo extends Expresion{
     
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
+        
+        Vector evctor = new Vector();
         return this.valor;
     }
     
